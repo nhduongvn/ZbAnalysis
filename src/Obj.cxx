@@ -63,6 +63,7 @@ class ZObj {
 
 } ;
 
+/*
 class JetPlot {
   
   public:
@@ -79,5 +80,5 @@ class JetPlot {
 	JetObj jet_cut1 ;
 } ;
 
-
+*/
 #endif
