@@ -176,37 +176,66 @@ int main(int argc, char *argv[]) {
   
   //Selection for Zb
   ZbSelection sel ;
-
+  
   std::string fName_btagSF;
+  std::vector<std::string> fName_eleTrig ;
   std::string fName_eleRecSF;
   std::string fName_eleIDSF;
+  std::vector<float> lw_eleTrig; //weights estimated from luminosity fraction used to calculate the scale factors from different run periods
   std::vector<std::string> fName_muonTrig ;
   std::vector<std::string> fName_muonID ;
   std::vector<std::string> fName_muonIso ;
   std::vector<float> lw_muonTrig; //weights estimated from luminosity fraction used to calculate the scale factors from different run periods
   std::vector<float> lw_muonID;
   std::vector<float> lw_muonIso;
+
+#if defined(MC_2016) || defined(DATA_2016)
+  std::string fName_roc("CalibData/RoccoR2016.txt") ;
+#endif
+#if defined(MC_2017) || defined(DATA_2017)
+  std::string fName_roc("CalibData/RoccoR2017.txt") ;
+#endif
+#if defined(MC_2018) || defined(DATA_2018)
+  std::string fName_roc("CalibData/RoccoR2018.txt") ;
+#endif
+
+#if defined(DATA_2016)
+  //std::string fName_lumiMaskFilter("CalibData/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt");
+  std::string fName_lumiMaskFilter("CalibData/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt");
+#endif
+#if defined(DATA_2017)
+  std::string fName_lumiMaskFilter("CalibData/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt");
+#endif
+#if defined(DATA_2018)
+  //std::string fName_lumiMaskFilter("CalibData/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt");
+  std::string fName_lumiMaskFilter("CalibData/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt");
+#endif
+
 #ifdef MC_2016
   fName_btagSF = "CalibData/DeepJet_2016LegacySF_WP_V1.csv" ;
+  fName_eleTrig.push_back("CalibData/sf_ele_2016_trig_v5.root");
   fName_eleRecSF = "CalibData/EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root" ;
   fName_eleIDSF = "CalibData/2016LegacyReReco_ElectronLoose_Fall17V2.root" ;
+  lw_eleTrig.push_back(1.0);//FIXME for place holder
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_RunBtoF_trigger_2016_muon.root");
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_Period4_trigger_mu2016_muon.root");
   lw_muonTrig.push_back(0.5);//FIXME
   lw_muonTrig.push_back(0.5);//FIXME
   fName_muonID.push_back("CalibData/RunBCDEF_SF_ID_2016_muon.root");
   fName_muonID.push_back("CalibData/RunGH_SF_ID_2016_muon.root");
-  lw_muonID.push_back(0.5);
-  lw_muonID.push_back(0.5);
+  lw_muonID.push_back(0.5);//FIXME
+  lw_muonID.push_back(0.5);//FIXME
   fName_muonIso.push_back("CalibData/RunBCDEF_SF_ISO_2016_muon.root");
   fName_muonIso.push_back("CalibData/RunGH_SF_ISO_2016_muon.root");
-  lw_muonIso.push_back(0.5);
-  lw_muonIso.push_back(0.5);
+  lw_muonIso.push_back(0.5);//FIXME
+  lw_muonIso.push_back(0.5);//FIXME
 #endif
 #ifdef MC_2017
   fName_btagSF = "CalibData/DeepCSV_94XSF_WP_V4_B_F.csv";
+  fName_eleTrig.push_back("CalibData/sf_ele_2017_trig_v5.root");
   fName_eleRecSF = "CalibData/egammaEffi.txt_EGM2D_runBCDEF_passingRECO_2017.root";
   fName_eleIDSF = "CalibData/2017_ElectronLoose.root";
+  lw_eleTrig.push_back(1.0);//FIXME for place holder
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_RunBtoF_Nov17Nov2017_trigger_muon.root");
   lw_muonTrig.push_back(1.);
   fName_muonID.push_back("CalibData/RunBCDEF_SF_ID_syst_2017_muon.root");
@@ -216,8 +245,10 @@ int main(int argc, char *argv[]) {
 #endif
 #ifdef MC_2018
   fName_btagSF = "CalibData/DeepCSV_102XSF_WP_V1.csv";
+  fName_eleTrig.push_back("CalibData/sf_ele_2018_trig_v5.root");
   fName_eleRecSF = "CalibData/egammaEffi.txt_EGM2D_updatedAll_2018.root";
   fName_eleIDSF = "CalibData/2018_ElectronLoose.root";
+  lw_eleTrig.push_back(1.0);//FIXME for place holder
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_2018Data_BeforeMuonHLTUpdate_trigger_muon.root");
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_2018Data_AfterMuonHLTUpdate_trigger_muon.root");
   lw_muonTrig.push_back(0.5);//FIXME
@@ -228,9 +259,14 @@ int main(int argc, char *argv[]) {
   lw_muonIso.push_back(1.);
 #endif
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+  sel.SetRandom() ; //used for muon rochestor correction (used when correcting for MC)
   sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/eff.root");
-  sel.SetEleEffCorr(fName_eleRecSF,fName_eleIDSF);
+  sel.SetEleEffCorr(fName_eleTrig,fName_eleRecSF,fName_eleIDSF,lw_eleTrig);
   sel.SetMuonEffCorr(fName_muonTrig,fName_muonID,fName_muonIso,lw_muonTrig,lw_muonID,lw_muonIso);
+#endif
+  sel.SetRochesterCorr(fName_roc) ;
+#if defined(DATA_2016) || defined(DATA_2017) || defined(DATA_2018)
+  sel.SetLumiMaskFilter(fName_lumiMaskFilter);
 #endif
 
   sels.push_back(&sel) ;
