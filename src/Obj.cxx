@@ -10,8 +10,8 @@ class LepObj {
 
   public:
     
-    LepObj(float pt, float eta, float phi, float mass, 
-           float iso) : m_iso(iso) { 
+    LepObj(float pt, float eta, float scEta, float phi, float mass, unsigned idx, int charge, 
+           float iso) : m_scEta(scEta), m_idx(idx), m_charge(charge), m_iso(iso) { 
              m_lvec.SetPtEtaPhiM(pt, eta, phi, mass) ; 
     } ;
 
@@ -19,6 +19,9 @@ class LepObj {
 
     TLorentzVector m_lvec ; 
     
+    float m_scEta ;
+    unsigned m_idx ;
+    int m_charge ;
     float m_iso ;
     
 } ;

@@ -1,6 +1,7 @@
 #define ZbSelection_cxx
 
 #include <math.h>
+#include <iostream>
 
 #include "TList.h"
 #include "TParameter.h"
@@ -10,7 +11,6 @@
 #include "Global.h"
 #include "Obj.cxx"
 
-#include <iostream>
 #include "TH1.h"
 
 //#include "BTagCalibrationStandalone.h"
@@ -31,12 +31,19 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_zee_jet = new ZbPlots("Zee_jet") ;
   h_zee_bjet = new ZbPlots("Zee_bjet") ;
   h_zee_2bjet = new Z2bPlots("Zee_2bjet") ;
+
+  h_zee_2bjet_bb = new Z2bPlots("Zee_2bjet_bb") ; //two tagged bjets are bb
+  h_zee_2bjet_bX = new Z2bPlots("Zee_2bjet_bX") ; //two tagged bjets are bb
+  h_zee_2bjet_XX = new Z2bPlots("Zee_2bjet_XX") ; //two tagged bjets are bb
   h_zee_bjet_deepJet = new ZbPlots("Zee_bjetDeepJet") ;
   h_zee_2bjet_deepJet = new Z2bPlots("Zee_2bjetDeepJet") ;
   
   h_zmm_jet = new ZbPlots("Zmm_jet") ;
   h_zmm_bjet = new ZbPlots("Zmm_bjet") ;
   h_zmm_2bjet = new Z2bPlots("Zmm_2bjet") ;
+  h_zmm_2bjet_bb = new Z2bPlots("Zmm_2bjet_bb") ; //two tagged bjets are bb
+  h_zmm_2bjet_bX = new Z2bPlots("Zmm_2bjet_bX") ; //two tagged bjets are bb
+  h_zmm_2bjet_XX = new Z2bPlots("Zmm_2bjet_XX") ; //two tagged bjets are bb
   h_zmm_bjet_deepJet = new ZbPlots("Zmm_bjetDeepJet") ;
   h_zmm_2bjet_deepJet = new Z2bPlots("Zmm_2bjetDeepJet") ;
   
@@ -48,6 +55,10 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_eff_bdj = new EffPlots("bdj", nBins, bins) ;
   h_eff_cdj = new EffPlots("cdj", nBins, bins) ;
   h_eff_ldj = new EffPlots("ldj", nBins, bins) ;
+
+  //Unfolding plots
+  h_zee_unfolding = new UnfoldingPlots("zee");
+  h_zmm_unfolding = new UnfoldingPlots("zmm");
 
   h_dR_je = new TH1D("h_dR_je","",500,0,5) ;
   h_dR_jm = new TH1D("h_dR_jm","",500,0,5) ;
@@ -66,7 +77,16 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_zmm_cutflow = new TH1D("zmm_cutflow","",10,-0.5,9.5) ;
 
   h_pt_jet_after_ele_rem = new TH1D("jet_pt_after_ele_rem","",200,0.0,200) ;
+  h_dR1_muonTrig = new TH1D("dR1_muonTrig","",100,0,10) ;
+  h_dR2_muonTrig = new TH1D("dR2_muonTrig","",100,0,10) ;
+  h_pt1_muonTrig = new TH1D("pt1_muonTrig","",200,0,200) ;
+  h_pt2_muonTrig = new TH1D("pt2_muonTrig","",200,0,200) ;
   
+  h_dR1_eleTrig = new TH1D("dR1_eleTrig","",100,0,10) ;
+  h_dR2_eleTrig = new TH1D("dR2_eleTrig","",100,0,10) ;
+  h_pt1_eleTrig = new TH1D("pt1_eleTrig","",200,0,200) ;
+  h_pt2_eleTrig = new TH1D("pt2_eleTrig","",200,0,200) ;
+
   //Sumw2
   h_Zee_ZmassFull->Sumw2() ;
   h_Zmm_ZmassFull->Sumw2() ;
@@ -89,9 +109,27 @@ void ZbSelection::SlaveBegin(Reader* r) {
   tmp = h_zee_2bjet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
+  tmp = h_zee_2bjet_bb->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
+  tmp = h_zee_2bjet_bX->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
+  tmp = h_zee_2bjet_XX->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
   tmp = h_zmm_2bjet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
+  tmp = h_zmm_2bjet_bb->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
+  tmp = h_zmm_2bjet_bX->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
+  tmp = h_zmm_2bjet_XX->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
   tmp = h_zee_bjet_deepJet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
@@ -117,6 +155,11 @@ void ZbSelection::SlaveBegin(Reader* r) {
   tmp = h_eff_ldj->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
+  //Unfolding plots 
+  tmp = h_zee_unfolding->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  tmp = h_zmm_unfolding->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
   r->GetOutputList()->Add(h_dR_je) ;
   r->GetOutputList()->Add(h_dR_jm) ;
@@ -131,13 +174,22 @@ void ZbSelection::SlaveBegin(Reader* r) {
   r->GetOutputList()->Add(h_zee_cutflow) ;
   r->GetOutputList()->Add(h_zmm_cutflow) ;
   r->GetOutputList()->Add(h_pt_jet_after_ele_rem) ;
+  r->GetOutputList()->Add(h_dR1_muonTrig) ;
+  r->GetOutputList()->Add(h_dR2_muonTrig) ;
+  r->GetOutputList()->Add(h_pt1_muonTrig) ;
+  r->GetOutputList()->Add(h_pt2_muonTrig) ;
+  r->GetOutputList()->Add(h_dR1_eleTrig) ;
+  r->GetOutputList()->Add(h_dR2_eleTrig) ;
+  r->GetOutputList()->Add(h_pt1_eleTrig) ;
+  r->GetOutputList()->Add(h_pt2_eleTrig) ;
+
   
-  const Int_t nx = 3, nx1 = 4, yx= 5, nzee=7, nzmm=7;
+  const Int_t nx = 3, nx1 = 4, yx= 5, nzee=8, nzmm=8;
   const char *ele_cut[nx] = {"all","kine","ID"};
   const char *muon_cut[nx1] = {"all","kine","loose muon ID", "iso"};
   const char *jet_cut[yx] = {"all", "kine", "ele overlap removal","muon overlap removal","loose jet ID"};
-  const char *zee_cut[nzee] = {"all event (not cut)","trigger","pass electron  cuts","pass Z mass cuts`", "pass jet cuts", "pass b-jet", "pass 2 b-jets"};
-  const char *zmm_cut[nzmm] = {"all event (not cut)","trigger","pass muon  cuts", "pass Z mass cuts", "pass jet cuts", "pass b-jet", "pass 2 b-jets"};
+  const char *zee_cut[nzee] = {"all event (not cut)","trigger","pass electron  cuts","pass Z mass cuts`", "pass jet cuts", "pass b-jet", "pass 2 b-jets", "Met"};
+  const char *zmm_cut[nzmm] = {"all event (not cut)","trigger","pass muon  cuts", "pass Z mass cuts", "pass jet cuts", "pass b-jet", "pass 2 b-jets", "Met"};
   for (int i=1;i<=nx;i++) h_ele_cutflow->GetXaxis()->SetBinLabel(i+1.5,ele_cut[i-1]);
   for (int i=1;i<=nx1;i++) h_muon_cutflow->GetXaxis()->SetBinLabel(i+1.5,muon_cut[i-1]);
   for (int i=1;i<=yx;i++) h_Jet_cutflow->GetXaxis()->SetBinLabel(i+1.5,jet_cut[i-1]);
@@ -147,6 +199,7 @@ void ZbSelection::SlaveBegin(Reader* r) {
 }
 
 void ZbSelection::Process(Reader* r) {
+  float METCUT(50) ; //FIXME
   //Weights
   float genWeight = 1. ;
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
@@ -156,9 +209,75 @@ void ZbSelection::Process(Reader* r) {
   if (*(r->genWeight) > 0) h_evt->Fill(1) ; 
 #endif
 
+#if defined(DATA_2016) || defined(DATA_2017) || defined(DATA_2018)
+  h_evt->Fill(-1) ;
+  if (!m_lumiFilter.Pass(*(r->run),*(r->luminosityBlock))) return;
+  h_evt->Fill(1) ;
+#endif
+
   float evtW = 1. ;
   
   if (!m_isData) evtW *= genWeight ;
+
+  //Gen events
+  //Z+2bjets
+  //
+#if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+  //2 gen lepton pt > 35 and 25 eta < 2.4, mass 71,111, two bjets with pt > 30 and fabs(eta) < 2.4
+  std::vector<TLorentzVector> gen_eles;
+  std::vector<TLorentzVector> gen_muons;
+  std::vector<TLorentzVector> zee_gen_uf;//0: gen leading electron, 1: subleading electron, 2: leading gen bjet, 3: subleading gen bjet
+  std::vector<TLorentzVector> zmm_gen_uf;
+  if (*(r->nGenDressedLepton)>=2) {
+    TLorentzVector lz1;
+    lz1.SetPtEtaPhiM((r->GenDressedLepton_pt)[0],(r->GenDressedLepton_eta)[0],(r->GenDressedLepton_phi)[0],(r->GenDressedLepton_mass)[0]) ;
+    TLorentzVector lz2;
+    lz2.SetPtEtaPhiM((r->GenDressedLepton_pt)[1],(r->GenDressedLepton_eta)[1],(r->GenDressedLepton_phi)[1],(r->GenDressedLepton_mass)[1]) ;
+    TLorentzVector lz3 = lz1 + lz2;
+    float mll = lz3.M();
+    if ((r->GenDressedLepton_pt)[0] > 35 && (r->GenDressedLepton_pt)[1] > 25 &&
+        fabs((r->GenDressedLepton_eta)[0]) < 2.4 && fabs((r->GenDressedLepton_eta)[1]) < 2.4 &&
+        mll > 71 && mll < 111) {
+      if (abs((r->GenDressedLepton_pdgId)[0]) == 11 && abs((r->GenDressedLepton_pdgId)[1]) == 11) {
+        for (unsigned iL = 0 ; iL < 2 ; ++iL) {
+          TLorentzVector tmp ;
+          tmp.SetPtEtaPhiM((r->GenDressedLepton_pt)[iL],(r->GenDressedLepton_eta)[iL],(r->GenDressedLepton_phi)[iL],(r->GenDressedLepton_mass)[iL]) ;
+          gen_eles.push_back(tmp);
+        }
+      } //Zee
+      if (abs((r->GenDressedLepton_pdgId)[0]) == 13 && abs((r->GenDressedLepton_pdgId)[1]) == 13) {
+        for (unsigned iL = 0 ; iL < 2 ; ++iL) {
+          TLorentzVector tmp ;
+          tmp.SetPtEtaPhiM((r->GenDressedLepton_pt)[iL],(r->GenDressedLepton_eta)[iL],(r->GenDressedLepton_phi)[iL],(r->GenDressedLepton_mass)[iL]) ;
+          gen_muons.push_back(tmp);
+        }
+      } //Zmm
+      //get gen bjets
+      std::vector<TLorentzVector> gen_bs ;
+      for (unsigned iJ = 0 ; iJ < *(r->nGenJet) ; ++iJ) {
+        if ((r->GenJet_pt)[iJ] > 30 && fabs((r->GenJet_eta)[iJ]) < 2.4 && (r->GenJet_hadronFlavour)[iJ] == 5) {
+          TLorentzVector tmp ;
+          tmp.SetPtEtaPhiM((r->GenJet_pt)[iJ],(r->GenJet_eta)[iJ],(r->GenJet_phi)[iJ],(r->GenJet_mass)[iJ]) ;
+          gen_bs.push_back(tmp);
+        }
+      }
+      //Zee + 2 bjet
+      if (gen_eles.size()>=2 && gen_bs.size()>=2) {
+        zee_gen_uf.push_back(gen_eles[0]);
+        zee_gen_uf.push_back(gen_eles[1]);
+        zee_gen_uf.push_back(gen_bs[0]);
+        zee_gen_uf.push_back(gen_bs[1]);
+      }
+      //Zmm + 2 bjet
+      if (gen_muons.size()>=2 && gen_bs.size()>=2) {
+        zmm_gen_uf.push_back(gen_muons[0]);
+        zmm_gen_uf.push_back(gen_muons[1]);
+        zmm_gen_uf.push_back(gen_bs[0]);
+        zmm_gen_uf.push_back(gen_bs[1]);
+      }
+    }
+  }
+#endif
   
   //=============Get objects============= 
   //electrons
@@ -168,25 +287,25 @@ void ZbSelection::Process(Reader* r) {
     
     h_ele_cutflow->Fill(1) ;
     
-    LepObj ele((r->Electron_pt)[i],(r->Electron_eta)[i],(r->Electron_phi)[i],(r->Electron_mass)[i],0) ;
+    float etaSC = (r->Electron_eta)[i]-(r->Electron_deltaEtaSC[i]) ;
+    LepObj ele((r->Electron_pt)[i],(r->Electron_eta)[i],etaSC,(r->Electron_phi)[i],(r->Electron_mass)[i],i,(r->Electron_charge)[i],0) ;
 
+    int eleId = r->Electron_cutBased[i] ; //cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
     //electron for electron jet overlap removal
     if (ele.m_lvec.Pt() > CUTS.Get<float>("lep_jetOverlap_pt") && fabs(ele.m_lvec.Eta()) < CUTS.Get<float>("lep_jetOverlap_eta")) {
-      int eleId = r->Electron_cutBased[i] ; 
-      if (eleId >= 2) {
+      if (eleId >= 2) { //looseId for jet removal
         eles_jetOverlap.push_back(ele) ;
       }
     }
 
     if (ele.m_lvec.Pt() < CUTS.Get<float>("lep_pt1") || fabs(ele.m_lvec.Eta()) > CUTS.Get<float>("lep_eta")) continue ; //use lower pt threshold to select both leading and subleading lepton
-    float etaSC = ele.m_lvec.Eta()-(r->Electron_deltaEtaSC[i]) ;
-    if (fabs(etaSC) < 1.566 && fabs(etaSC) > 1.442) continue ;
+    if (fabs(ele.m_scEta) < 1.566 && fabs(ele.m_scEta) > 1.442) continue ;
 
     h_ele_cutflow->Fill(2)  ;
 
-    int eleId = r->Electron_cutBased[i] ; 
+    //int eleId = r->Electron_cutBased[i] ; 
     //if (r-> Electron_mvaFall17V1Iso_WP90[i] <= 0) continue;
-    if (eleId < 2) continue; //loose electron id
+    if (eleId < 4) continue; //use tightId to be consistent with single electron trigger
     h_ele_cutflow->Fill(3)  ;
 
 	  eles.push_back(ele) ;
@@ -200,7 +319,15 @@ void ZbSelection::Process(Reader* r) {
 
     h_muon_cutflow->Fill(1) ;
     
-    LepObj muon((r->Muon_pt)[i],(r->Muon_eta)[i],(r->Muon_phi)[i],(r->Muon_mass)[i],(r->Muon_pfRelIso04_all)[i]) ;
+    LepObj muon((r->Muon_pt)[i],(r->Muon_eta)[i],-1,(r->Muon_phi)[i],(r->Muon_mass)[i],i,(r->Muon_charge)[i],(r->Muon_pfRelIso04_all)[i]) ;
+    float sf_rc = MuonRcSF(r, muon, 13) ;
+    //TEMP
+    //sf_rc = 1.0;
+    //std::cout << "\n Before correction: " <<  sf_rc << " " << muon.m_lvec.Pt() ;
+    //muon.m_lvec.Print() ;
+    muon.m_lvec.SetPtEtaPhiM(muon.m_lvec.Pt()*sf_rc,muon.m_lvec.Eta(),muon.m_lvec.Phi(),muon.m_lvec.M()) ;
+    //std::cout << "\n After " << muon.m_lvec.Pt() ;
+    //muon.m_lvec.Print() ;
     
     //muon for muon jet overlap removal
     if (muon.m_lvec.Pt() > CUTS.Get<float>("lep_jetOverlap_pt") && fabs(muon.m_lvec.Eta()) < CUTS.Get<float>("lep_jetOverlap_eta")) {
@@ -212,7 +339,7 @@ void ZbSelection::Process(Reader* r) {
     if (muon.m_lvec.Pt() < CUTS.Get<float>("lep_pt1") || fabs(muon.m_lvec.Eta()) > CUTS.Get<float>("lep_eta")) continue ; 
     h_muon_cutflow->Fill(2) ;
     
-    if (r-> Muon_looseId[i] <= 0) continue;
+    if (r-> Muon_tightId[i] <= 0) continue;
     h_muon_cutflow->Fill(3) ;
 	  
     if (muon.m_iso > CUTS.Get<float>("muon_iso")) continue ; 
@@ -239,6 +366,7 @@ void ZbSelection::Process(Reader* r) {
   std::vector<JetObj> bjets_deepJet ;
   
   float btagM_cut = CUTS.Get<float>("jet_deepCSVM_"+m_year) ;
+  float btagT_cut = CUTS.Get<float>("jet_deepCSVT_"+m_year) ;
   float btagDeepJetM_cut = CUTS.Get<float>("jet_deepJetM_"+m_year) ;
 
   for (unsigned int i = 0 ; i < *(r->nJet) ; ++i) {
@@ -267,41 +395,77 @@ void ZbSelection::Process(Reader* r) {
 	  
     jets.push_back(jet) ;
 
-    if (jet.m_deepCSV >= btagM_cut) bjets.push_back(jet) ;
+    if (jet.m_deepCSV >= btagT_cut) bjets.push_back(jet) ;
     if (jet.m_deepJet >= btagDeepJetM_cut) bjets_deepJet.push_back(jet) ;
 
   }
-
 
   //calculate SF for eletron, muon and btagging
   float eleSF_w(1.);
   float muonSF_w(1.);
   float btag_w(1.);
   if (!m_isData) {
+    //note this is SF for medium DeepCSV
+    //FIXME make CalBtagWeight more universal
     btag_w = CalBtagWeight(jets) ;
     if (eles.size()>=2) eleSF_w = CalEleSF(eles[0],eles[1]) ;
     if (muons.size()>=2) muonSF_w = CalMuonSF_id_iso(muons[0],muons[1]);
   }
+
   //if (bjets.size()>=1) std::cout << "\n btagWeight: " << btagWeight ;
 
-  
+  //trigger stuffs  
   bool eleTrig(false) ;
   bool muonTrig(false) ;
-
+  float ptThr_ele(0) ;
+  float ptThr_muon(0) ;
+//Get trigger objects
+  TLorentzVector muon_trigObj ;
+  TLorentzVector ele_trigObj ;
+  unsigned ele_bits ;
+  unsigned muon_bits ;
 #if defined(MC_2016) || defined(DATA_2016) 
   if (*(r->HLT_Ele27_WPTight_Gsf)) eleTrig = true ;
   if (*(r->HLT_IsoMu24) || *(r->HLT_IsoTkMu24)) muonTrig = true ;
+  //sel.qualityBitsDoc = cms.string("1 = TrkIsoVVL, 2 = Iso, 4 = OverlapFilter PFTau, 8 = IsoTkMu, 1024 = 1mu (Mu50)")
+  //https://github.com/cms-nanoAOD/cmssw/blob/master-102X/PhysicsTools/NanoAOD/python/triggerObjects_cff.py
+  muon_bits = (2+8) ; //iso + IsoTkMu
+  //qualityBitsDoc = cms.string("1 = CaloIdL_TrackIdL_IsoVL, 2 = 1e (WPTight), 4 = 1e (WPLoose), 8 = OverlapFilter PFTau, 16 = 2e, 32 = 1e-1mu, 64 = 1e-1tau, 128 = 3e, 256 = 2e-1mu, 512 = 1e-2mu, 1024 = 1e (32_L1DoubleEG_AND_L1SingleEGOr), 2048 = 1e (CaloIdVT_GsfTrkIdT), 4096 = 1e (PFJet), 8192 = 1e (Photon175_OR_Photon200)"),),
+  ele_bits = (2) ;
+  ptThr_ele = 27 ;
+  ptThr_muon = 24 ;
 #endif
 
 #if defined(MC_2017) || defined(DATA_2017) 
-  if (*(r->HLT_Ele35_WPTight_Gsf)) eleTrig = true ;
+  //https://indico.cern.ch/event/787358/contributions/3504805/attachments/1883444/3112792/trigger_sf_vgg_HLTEle32_2017_290719.pdf
+  if (*(r->HLT_Ele32_WPTight_Gsf_L1DoubleEG)) eleTrig = true ;
   if (*(r->HLT_IsoMu27)) muonTrig = true ;
+  //qualityBitsDoc = cms.string("1 = TrkIsoVVL, 2 = Iso, 4 = OverlapFilter PFTau, 8 = 1mu, 16 = 2mu, 32 = 1mu-1e, 64 = 1mu-1tau, 128 = 3mu, 256 = 2mu-1e, 512 = 1mu-2e, 1024 = 1mu (Mu50), 2048 = 1mu (Mu100)"),),
+  ele_bits = (2) ;
+  muon_bits = (2) ;
+  ptThr_ele = 32 ;
+  ptThr_muon = 27 ;
 #endif
 
 #if defined(MC_2018) || defined(DATA_2018) 
   if (*(r->HLT_Ele32_WPTight_Gsf)) eleTrig = true ;
   if (*(r->HLT_IsoMu24)) muonTrig = true ;
+  ele_bits = (2) ;
+  muon_bits = (2) ;
+  ptThr_ele = 32 ;
+  ptThr_muon = 24 ;
 #endif
+  
+  TLorentzVector trigObj_ele = GetTrigObj(r, 11, ele_bits, ptThr_ele) ;
+  TLorentzVector trigObj_muon = GetTrigObj(r, 13, muon_bits, ptThr_muon) ;
+
+  float trigSF_ele(1) ;
+  if (!m_isData && (eles.size() >= 2)) {
+    trigSF_ele =  CalTrigSF(11,eles[0], eles[1], trigObj_ele, h_dR1_eleTrig, h_dR2_eleTrig, h_pt1_eleTrig, h_pt2_eleTrig) ;
+  }
+  
+  float trigSF_muon(1) ;
+  if (!m_isData && (muons.size() >= 2)) trigSF_muon =  CalTrigSF(13,muons[0], muons[1], trigObj_muon, h_dR1_muonTrig, h_dR2_muonTrig, h_pt1_muonTrig, h_pt2_muonTrig) ;
 
   //TEMP
   //eleTrig = true ;
@@ -309,13 +473,17 @@ void ZbSelection::Process(Reader* r) {
   //Zee + jets
   ////////////////////////////////////
   h_zee_cutflow->Fill(1); //all events (not cut)
+  std::vector<TLorentzVector> zee_rec_uf; //0: leading lepton, 1: subleading lepton, 2: bjet 1, 3: bjet 2
+  float w_zee_rec_uf(1);
   if (eleTrig) {
     h_zee_cutflow->Fill(2); //trigger
     if (eles.size() >= 2 && eles[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0")) {
 
 	    h_zee_cutflow->Fill(3) ; //pass electron  cuts
       
-      float zee_w = evtW*eleSF_w ;
+      float zee_w = evtW*eleSF_w*trigSF_ele ;
+      //TEMP
+      //std::cout << "\n Ele weights: " << "  " << evtW << "  " << eleSF_w << "  " << trigSF_ele << "  " << zee_w; 
       float zeeb_w = zee_w*btag_w;
       
       ZObj Z(eles[0],eles[1]) ;
@@ -361,9 +529,39 @@ void ZbSelection::Process(Reader* r) {
           
           h_zee_cutflow->Fill(7) ;
 
-          h_zee_2bjet->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
-          h_zee_2bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
-        }
+#if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+          //rec objects for unfolding before METCUT
+          if (bjets[0].m_flav == 5 && bjets[1].m_flav == 5) {
+            w_zee_rec_uf = zee_w;
+            zee_rec_uf.push_back(eles[0].m_lvec);
+            zee_rec_uf.push_back(eles[1].m_lvec);
+            zee_rec_uf.push_back(bjets[0].m_lvec);
+            zee_rec_uf.push_back(bjets[1].m_lvec);
+          }
+#endif          
+          if (*(r->MET_pt) < METCUT) {
+            
+            h_zee_cutflow->Fill(8) ;
+
+            h_zee_2bjet->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
+            h_zee_2bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+
+#if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+            if (bjets[0].m_flav == 5 && bjets[1].m_flav == 5) {
+              h_zee_2bjet_bb->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
+              h_zee_2bjet_bb->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+            }
+            else if ((bjets[0].m_flav == 5 && bjets[1].m_flav != 5) || (bjets[0].m_flav != 5 && bjets[1].m_flav == 5)) {
+              h_zee_2bjet_bX->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
+              h_zee_2bjet_bX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+            }
+            else {
+              h_zee_2bjet_XX->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
+              h_zee_2bjet_XX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+            }
+#endif
+          } //end MET cut
+        } //end two b-tagged deepCSV jets
 
         //at least one b-tagged jets using deepJet
         h_zee_bjet_deepJet->FillNjet(bjets_deepJet.size(),evtW) ; //FIXME 
@@ -373,7 +571,7 @@ void ZbSelection::Process(Reader* r) {
 
           h_zee_bjet_deepJet->Fill(Z, bjets_deepJet[0], evtW) ; //FIXME
           h_zee_bjet_deepJet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW); //FIXME
-        }
+        } //end one b-tagged jets using deepJet
 
         //at least two b-tagged jets using deepJet
         if (bjets_deepJet.size() >=2) {
@@ -382,7 +580,7 @@ void ZbSelection::Process(Reader* r) {
 
           h_zee_2bjet_deepJet->Fill(Z, bjets_deepJet[0], bjets_deepJet[1], evtW) ; //FIXME
           h_zee_2bjet_deepJet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW); //FIXME
-        }
+        } //end at least two b-tagged jets using deepJet
 
       }//end Z mass
     } //end two electrons
@@ -399,13 +597,19 @@ void ZbSelection::Process(Reader* r) {
   //Zmm + jets
   ///////////////////////////
   h_zmm_cutflow->Fill(1); //all events (not cut)
+  
+  std::vector<TLorentzVector> zmm_rec_uf; //0: leading lepton, 1: subleading lepton, 2: bjet 1, 3: bjet 2
+  float w_zmm_rec_uf(1);
   //trigger cuts
   if (muonTrig) {
     h_zmm_cutflow->Fill(2); //trigger
     if (muons.size() >= 2 && muons[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0")) {
 	    h_zmm_cutflow->Fill(3) ; //pass muon  cuts
 
-      float zmm_w = evtW*muonSF_w ;
+      float zmm_w = evtW*muonSF_w*trigSF_muon ;
+      //TEMP
+      //zmm_w = evtW*muonSF_w;
+      //std::cout << "\n evtW: " << evtW << " " << muonSF_w << " " << trigSF_muon << " " << zmm_w; 
       float zmmb_w = zmm_w*btag_w;
       
       ZObj Z(muons[0],muons[1]) ;
@@ -447,12 +651,44 @@ void ZbSelection::Process(Reader* r) {
       
         //Zmm+2bjets
         if (bjets.size() >= 2) {
-
-          h_zmm_cutflow->Fill(7) ;
           
-          h_zmm_2bjet->Fill(Z, bjets[0], bjets[1], zmmb_w) ; 
-          h_zmm_2bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
-        }
+          h_zmm_cutflow->Fill(7) ;
+      
+#if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+          //Unfolding plots
+          if (bjets[0].m_flav == 5 && bjets[1].m_flav == 5) {
+            w_zmm_rec_uf = zmmb_w;
+            zmm_rec_uf.push_back(muons[0].m_lvec);
+            zmm_rec_uf.push_back(muons[1].m_lvec);
+            zmm_rec_uf.push_back(bjets[0].m_lvec);
+            zmm_rec_uf.push_back(bjets[1].m_lvec);
+          }
+#endif
+
+          if (*(r->MET_pt) < METCUT) {
+            
+            h_zmm_cutflow->Fill(8) ;
+            
+            h_zmm_2bjet->Fill(Z, bjets[0], bjets[1], zmmb_w) ; 
+            h_zmm_2bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+
+#if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+            if (bjets[0].m_flav == 5 && bjets[1].m_flav == 5) {
+              h_zmm_2bjet_bb->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
+              h_zmm_2bjet_bb->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+            }
+            else if ((bjets[0].m_flav == 5 && bjets[1].m_flav != 5) || (bjets[0].m_flav != 5 && bjets[1].m_flav == 5)) {
+              h_zmm_2bjet_bX->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
+              h_zmm_2bjet_bX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+            }
+            else {
+              h_zmm_2bjet_XX->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
+              h_zmm_2bjet_XX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+            }
+
+#endif
+          } //end met cut
+        } //end at least two b-tagged jets
 
         //at least one b-tagged jets using deepJet
         h_zmm_bjet_deepJet->FillNjet(bjets_deepJet.size(),evtW) ; //FIXME 
@@ -473,11 +709,20 @@ void ZbSelection::Process(Reader* r) {
           h_zmm_2bjet_deepJet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW); //FIXME
         }
 
-
       } //end Z mass cut
 
     } //end two muons
   } //end trigger
+
+  //Fill additional unfolding plots
+#if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+  //if (zee_rec_uf.size() != 0 || zee_gen_uf.size() != 0) std::cout << "\n Size zee: " << zee_rec_uf.size() << " " << zee_gen_uf.size() ;
+  //if (zmm_rec_uf.size() != 0 || zmm_gen_uf.size() != 0) std::cout << "\n Size zmm: " << zmm_rec_uf.size() << " " << zmm_gen_uf.size() ;
+  FillUnfolding(zee_rec_uf,zee_gen_uf,h_zee_unfolding,w_zee_rec_uf,genWeight); 
+  FillUnfolding(zmm_rec_uf,zmm_gen_uf,h_zmm_unfolding,w_zmm_rec_uf,genWeight); 
+#endif
+
+  return;
 
 } //end Process
 
@@ -506,7 +751,7 @@ void ZbSelection::Terminate(TList* mergedList, std::string outFileName) {
   aList->Add(a) ;
   a = new TParameter<double>("jet_eta",CUTS.Get<float>("jet_eta")) ;
   aList->Add(a) ;
-  std::string name = "jet_deepCSVM_" + m_year ;
+  std::string name = "jet_deepCSVT_" + m_year ;
   a = new TParameter<double>(name.c_str(),CUTS.Get<float>(name)) ;
   aList->Add(a) ;
   name = "jet_deepJetM_" + m_year ;
@@ -541,6 +786,47 @@ void ZbSelection::Fill_btagEffi(std::vector<JetObj> jets, float w) {
       if (jets[iJ].m_deepCSV > CUTS.Get<float>("jet_deepCSVM_" + m_year)) h_eff_l->Fill(jets[iJ].m_lvec.Pt(),"num",w) ; 
       h_eff_ldj->Fill(jets[iJ].m_lvec.Pt(),"deno",w) ;
       if (jets[iJ].m_deepJet > CUTS.Get<float>("jet_deepJetM_" + m_year)) h_eff_ldj->Fill(jets[iJ].m_lvec.Pt(),"num",w) ; 
+    }
+  }
+}
+
+//Fill unfolding plots
+void ZbSelection::FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_rec, float w_gen) {
+  //has reco
+  if (recs.size()==4) {
+    h->Fill("REC_ALL",recs[0],recs[1],recs[2],recs[3],w_rec);
+    if (gens.size()!=4) { //has reco but no gen
+      //std::cout << "\n Has reco, gens.size != 4" << gens.size();
+      h->Fill("REC_NOGENMATCH",recs[0],recs[1],recs[2],recs[3],w_rec);
+    }
+    else { //has gen
+      float dR1 = std::min(recs[0].DeltaR(gens[0]),recs[0].DeltaR(gens[1]));
+      float dR2 = std::min(recs[1].DeltaR(gens[0]),recs[1].DeltaR(gens[1]));
+      float dR3 = std::min(recs[2].DeltaR(gens[2]),recs[2].DeltaR(gens[3]));
+      float dR4 = std::min(recs[3].DeltaR(gens[2]),recs[3].DeltaR(gens[3]));
+      if (dR1 > 0.2 || dR2 > 0.2 || dR3 > 0.2 || dR4 > 0.2) { //no matching found fill bkgr
+        //std::cout << "\n Has reco, has gen, fail dR" << gens.size();
+        h->Fill("REC_NOGENMATCH",recs[0],recs[1],recs[2],recs[3],w_rec);
+      }
+      else { //matching found fill response matrix
+        //std::cout << "\n Has reco, has gen, pass dR" << gens.size();
+        h->FillRes(recs[0],recs[1],recs[2],recs[3],gens[0],gens[1],gens[2],gens[3],w_rec*w_gen);
+      }
+    }
+  }
+  if (gens.size()==4) { //has gen
+    h->Fill("GEN_ALL",gens[0],gens[1],gens[2],gens[3],w_gen);
+    if (recs.size()!=4) { //has gen no reco
+      h->Fill("GEN_NORECMATCH",gens[0],gens[1],gens[2],gens[3],w_gen);
+    }
+    else { //has gen and reco but whether they match or not
+      float dR1 = min(gens[0].DeltaR(recs[0]),gens[0].DeltaR(recs[1]));
+      float dR2 = min(gens[1].DeltaR(recs[0]),gens[1].DeltaR(recs[1]));
+      float dR3 = min(gens[2].DeltaR(recs[2]),gens[2].DeltaR(recs[3]));
+      float dR4 = min(gens[3].DeltaR(recs[2]),gens[3].DeltaR(recs[3]));
+      if (dR1 > 0.2 || dR2 > 0.2 || dR3 > 0.2 || dR4 > 0.2) { //no matching found fill bkgr
+        h->Fill("GEN_NOGENMATCH",gens[0],gens[1],gens[2],gens[3],w_gen);
+      }
     }
   }
 }

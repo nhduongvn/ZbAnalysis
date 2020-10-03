@@ -21,7 +21,7 @@ public:
   virtual void SlaveTerminate(Reader* r) {} ;
   virtual void Terminate(TList* mergedList, std::string outFileName) ;
   virtual void Fill_btagEffi(std::vector<JetObj> jets, float w=1) ;
-
+  virtual void FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_rec, float w_gen) ;
 private:
 
   //histograms
@@ -30,7 +30,13 @@ private:
   ZbPlots* h_zee_bjet ;
   ZbPlots* h_zmm_bjet ;
   Z2bPlots* h_zee_2bjet ;
+  Z2bPlots* h_zee_2bjet_bb ;
+  Z2bPlots* h_zee_2bjet_bX ;
+  Z2bPlots* h_zee_2bjet_XX ;
   Z2bPlots* h_zmm_2bjet ;
+  Z2bPlots* h_zmm_2bjet_bb ;
+  Z2bPlots* h_zmm_2bjet_bX ;
+  Z2bPlots* h_zmm_2bjet_XX ;
 
   ZbPlots* h_zee_bjet_deepJet ;
   ZbPlots* h_zmm_bjet_deepJet ;
@@ -43,6 +49,10 @@ private:
   EffPlots* h_eff_bdj ;
   EffPlots* h_eff_cdj ;
   EffPlots* h_eff_ldj ;
+ 
+  //Unfolding Plots
+  UnfoldingPlots* h_zee_unfolding;
+  UnfoldingPlots* h_zmm_unfolding;
   
 
   TH1D* h_evt ;
@@ -60,6 +70,17 @@ private:
  
   TH1D* h_Zee_ZmassFull ;
   TH1D* h_Zmm_ZmassFull ;
+
+  //check trigger matching
+  TH1D* h_dR1_muonTrig ;
+  TH1D* h_dR2_muonTrig ;
+  TH1D* h_pt1_muonTrig ;
+  TH1D* h_pt2_muonTrig ;
+  
+  TH1D* h_dR1_eleTrig ;
+  TH1D* h_dR2_eleTrig ;
+  TH1D* h_pt1_eleTrig ;
+  TH1D* h_pt2_eleTrig ;
 
 } ;
 

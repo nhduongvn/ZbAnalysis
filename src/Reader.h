@@ -25,6 +25,10 @@ public :
    TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
 
    // Readers to access the data (delete the ones you do not need).
+#if defined(DATA_2016) || defined(DATA_2017) || defined(DATA_2018)
+   TTreeReaderValue<UInt_t> run = {fReader, "run"};
+   TTreeReaderValue<UInt_t> luminosityBlock = {fReader, "luminosityBlock"};
+#endif
    
    //reco electrons
    TTreeReaderValue<UInt_t> nElectron = {fReader, "nElectron"};
@@ -33,6 +37,7 @@ public :
    TTreeReaderArray<Float_t> Electron_deltaEtaSC = {fReader, "Electron_deltaEtaSC"};
    TTreeReaderArray<Float_t> Electron_phi = {fReader, "Electron_phi"};
    TTreeReaderArray<Float_t> Electron_mass = {fReader, "Electron_mass"};
+   TTreeReaderArray<Int_t> Electron_charge = {fReader, "Electron_charge"};
    TTreeReaderArray<Int_t> Electron_cutBased = {fReader, "Electron_cutBased"};
    
    //reco muons
@@ -41,8 +46,33 @@ public :
    TTreeReaderArray<Float_t> Muon_eta = {fReader, "Muon_eta"};
    TTreeReaderArray<Float_t> Muon_phi = {fReader, "Muon_phi"};
    TTreeReaderArray<Float_t> Muon_mass = {fReader, "Muon_mass"};
+   TTreeReaderArray<Int_t> Muon_charge = {fReader, "Muon_charge"};
+   TTreeReaderArray<Int_t> Muon_nTrackerLayers = {fReader, "Muon_nTrackerLayers"};
    TTreeReaderArray<Float_t> Muon_pfRelIso04_all = {fReader, "Muon_pfRelIso04_all"};
    TTreeReaderArray<Bool_t> Muon_looseId = {fReader, "Muon_looseId"};
+   TTreeReaderArray<Bool_t> Muon_tightId = {fReader, "Muon_tightId"};
+#if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+   TTreeReaderArray<Int_t> Muon_genPartIdx = {fReader, "Muon_genPartIdx"};
+#endif
+
+   //GenDressedLepton_pt
+#if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+   TTreeReaderValue<UInt_t> nGenDressedLepton = {fReader, "nGenDressedLepton"};
+   TTreeReaderArray<Float_t> GenDressedLepton_eta = {fReader, "GenDressedLepton_eta"};
+   TTreeReaderArray<Float_t> GenDressedLepton_mass = {fReader, "GenDressedLepton_mass"};
+   TTreeReaderArray<Float_t> GenDressedLepton_phi = {fReader, "GenDressedLepton_phi"};
+   TTreeReaderArray<Float_t> GenDressedLepton_pt = {fReader, "GenDressedLepton_pt"};
+   TTreeReaderArray<Int_t> GenDressedLepton_pdgId = {fReader, "GenDressedLepton_pdgId"};
+   TTreeReaderArray<Float_t> GenPart_pt = {fReader, "GenPart_pt"};
+  
+   TTreeReaderValue<UInt_t> nGenJet = {fReader, "nGenJet"};
+   TTreeReaderArray<Float_t> GenJet_eta = {fReader, "GenJet_eta"};
+   TTreeReaderArray<Float_t> GenJet_mass = {fReader, "GenJet_mass"};
+   TTreeReaderArray<Float_t> GenJet_phi = {fReader, "GenJet_phi"};
+   TTreeReaderArray<Float_t> GenJet_pt = {fReader, "GenJet_pt"};
+   TTreeReaderArray<UChar_t> GenJet_hadronFlavour = {fReader, "GenJet_hadronFlavour"};
+
+#endif
 
    //reco SV
    TTreeReaderValue<UInt_t> nSV = {fReader, "nSV"};
@@ -73,14 +103,23 @@ public :
    TTreeReaderValue<Bool_t> HLT_IsoTkMu24 = {fReader, "HLT_IsoTkMu24"};
 #endif
    //ele trigger
+#if defined(MC_2016) || defined(DATA_2016)
    TTreeReaderValue<Bool_t> HLT_Ele27_WPTight_Gsf = {fReader, "HLT_Ele27_WPTight_Gsf"};
-#if !defined(MC_2016) && !defined(DATA_2016)
-   TTreeReaderValue<Bool_t> HLT_Ele35_WPTight_Gsf = {fReader, "HLT_Ele35_WPTight_Gsf"};
 #endif
-
-#if !defined(DATA_2016) && !defined(DATA_2017)
+#if defined(MC_2017) || defined(DATA_2017)
+   TTreeReaderValue<Bool_t> HLT_Ele32_WPTight_Gsf_L1DoubleEG = {fReader, "HLT_Ele32_WPTight_Gsf_L1DoubleEG"};
+#endif 
+#if defined(MC_2018) || defined(DATA_2018)
    TTreeReaderValue<Bool_t> HLT_Ele32_WPTight_Gsf = {fReader, "HLT_Ele32_WPTight_Gsf"};
 #endif
+
+   //trigger objects
+   TTreeReaderValue<UInt_t> nTrigObj = {fReader, "nTrigObj"};
+   TTreeReaderArray<Float_t> TrigObj_pt = {fReader, "TrigObj_pt"};
+   TTreeReaderArray<Float_t> TrigObj_eta = {fReader, "TrigObj_eta"};
+   TTreeReaderArray<Float_t> TrigObj_phi = {fReader, "TrigObj_phi"};
+   TTreeReaderArray<Int_t> TrigObj_id = {fReader, "TrigObj_id"};
+   TTreeReaderArray<Int_t> TrigObj_filterBits = {fReader, "TrigObj_filterBits"};
 
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
    TTreeReaderValue<Float_t> genWeight = {fReader, "genWeight"};

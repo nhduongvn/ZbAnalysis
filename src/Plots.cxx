@@ -342,5 +342,109 @@ class EffPlots
     TH1D* h_pt_num ;
 } ;
 
+class UnfoldingPlots
+{
+  public:
+    UnfoldingPlots(TString name) : m_name(name) {
+     unsigned nBins_pt_rec_b(10) ;
+     float xBins_pt_rec_b[nBins_pt_rec_b] = {30, 35, 40, 50, 60, 70, 90, 110, 130, 150, 200};
+     unsigned nBins_pt_gen_b(6) ;
+     float xBins_pt_gen_b[nBins_pt_gen_b] = {30, 40, 50, 70, 110, 150, 200};
+     unsigned nBins_pt_rec_Z(10);
+     float xBins_pt_rec_Z[nBins_pt_rec_Z] = {0,20,30,40,50,60,70,90,120,150,200};
+     unsigned nBins_pt_gen_Z(6);
+     float xBins_pt_gen_Z[nBins_pt_gen_Z] = {0,30,50,70,90,150,200};
+     h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_all_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
+     h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_noGenMatch_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
+
+     h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_all_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_noRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_all_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_noRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_all_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
+     h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_noRecMatch_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
+     
+     h_pt_res_b1 = new TH2D("pt_res_b1_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b, nBins_pt_rec_b, xBins_pt_rec_b);
+     h_pt_res_b2 = new TH2D("pt_res_b2_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b, nBins_pt_rec_b, xBins_pt_rec_b);
+     h_pt_res_Z = new TH2D("pt_res_Z_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z, nBins_pt_rec_Z, xBins_pt_rec_Z);
+
+     for(auto h : h_pt_gen_b1) h->Sumw2();
+     for(auto h : h_pt_gen_b2) h->Sumw2();
+     for(auto h : h_pt_gen_Z) h->Sumw2();
+     for(auto h : h_pt_rec_b1) h->Sumw2();
+     for(auto h : h_pt_rec_b2) h->Sumw2();
+     for(auto h : h_pt_rec_Z) h->Sumw2();
+     h_pt_res_b1->Sumw2();
+     h_pt_res_b2->Sumw2();
+     h_pt_res_Z->Sumw2();
+
+    }
+    
+    void Fill(TString type, TLorentzVector l1, TLorentzVector l2, TLorentzVector b1, TLorentzVector b2, float w) {
+      TLorentzVector Z = l1 + l2 ;
+      if (type == "REC_ALL") {
+        h_pt_rec_b1[0]->Fill(b1.Pt(),w);
+        h_pt_rec_b2[0]->Fill(b2.Pt(),w);
+        h_pt_rec_Z[0]->Fill(Z.Pt(),w);
+      }
+      if (type == "REC_NOGENMATCH") {
+        h_pt_rec_b1[1]->Fill(b1.Pt(),w);
+        h_pt_rec_b2[1]->Fill(b2.Pt(),w);
+        h_pt_rec_Z[1]->Fill(Z.Pt(),w);
+      }
+      if (type == "GEN_ALL") {
+        h_pt_gen_b1[0]->Fill(b1.Pt(),w) ;
+        h_pt_gen_b2[0]->Fill(b2.Pt(),w) ;
+        h_pt_gen_Z[0]->Fill(Z.Pt(),w) ;
+      }
+      if (type == "GEN_NORECMATCH") {
+        h_pt_gen_b1[1]->Fill(b1.Pt(),w) ;
+        h_pt_gen_b2[1]->Fill(b2.Pt(),w) ;
+        h_pt_gen_Z[1]->Fill(Z.Pt(),w) ;
+      }
+    }
+    
+    void FillRes(TLorentzVector rec_l1, TLorentzVector rec_l2, TLorentzVector rec_b1, TLorentzVector rec_b2, TLorentzVector gen_l1, TLorentzVector gen_l2, TLorentzVector gen_b1, TLorentzVector gen_b2, float w) {
+      TLorentzVector rec_Z = rec_l1 + rec_l2;
+      TLorentzVector gen_Z = gen_l1 + gen_l2;
+      h_pt_res_b1->Fill(gen_b1.Pt(),rec_b1.Pt(),w);
+      h_pt_res_b2->Fill(gen_b2.Pt(),rec_b2.Pt(),w);
+      h_pt_res_Z->Fill(gen_Z.Pt(),rec_Z.Pt(),w);
+    }
+
+    std::vector<TH1*> returnHisto() {
+      std::vector<TH1*> histolist;
+      for (unsigned i = 0 ; i < h_pt_rec_b1.size() ; ++i) histolist.push_back(h_pt_rec_b1[i]);
+      for (unsigned i = 0 ; i < h_pt_rec_b2.size() ; ++i) histolist.push_back(h_pt_rec_b2[i]);
+      for (unsigned i = 0 ; i < h_pt_rec_Z.size() ; ++i) histolist.push_back(h_pt_rec_Z[i]);
+      for (unsigned i = 0 ; i < h_pt_gen_b1.size() ; ++i) histolist.push_back(h_pt_gen_b1[i]);
+      for (unsigned i = 0 ; i < h_pt_gen_b2.size() ; ++i) histolist.push_back(h_pt_gen_b2[i]);
+      for (unsigned i = 0 ; i < h_pt_gen_Z.size() ; ++i) histolist.push_back(h_pt_gen_Z[i]);
+      histolist.push_back(h_pt_res_b1);
+      histolist.push_back(h_pt_res_b2);
+      histolist.push_back(h_pt_res_Z);
+      return histolist;
+    }
+
+  private:
+    TString m_name;
+    //plots for background (x-axis = rec)
+    std::vector<TH1D*> h_pt_rec_b1; //0: all rec, 1: rec not have matched gen
+    std::vector<TH1D*> h_pt_rec_b2;
+    std::vector<TH1D*> h_pt_rec_Z;
+    //plots for eff (x-axis = gen)
+    std::vector<TH1D*> h_pt_gen_b1; //0: all gen, 1: gen not have matched reco
+    std::vector<TH1D*> h_pt_gen_b2;
+    std::vector<TH1D*> h_pt_gen_Z;
+    //plots for response matrix
+    TH2D* h_pt_res_b1;
+    TH2D* h_pt_res_b2;
+    TH2D* h_pt_res_Z;
+} ;
+
 
 #endif

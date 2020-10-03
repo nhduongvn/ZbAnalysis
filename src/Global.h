@@ -27,6 +27,9 @@ namespace glob {
         parameterNames.push_back("jet_deepCSVM_2016") ;
         parameterNames.push_back("jet_deepCSVM_2017") ;
         parameterNames.push_back("jet_deepCSVM_2018") ;
+        parameterNames.push_back("jet_deepCSVT_2016") ;
+        parameterNames.push_back("jet_deepCSVT_2017") ;
+        parameterNames.push_back("jet_deepCSVT_2018") ;
         parameterNames.push_back("jet_deepJetM_2016") ;
         parameterNames.push_back("jet_deepJetM_2017") ;
         parameterNames.push_back("jet_deepJetM_2018") ;
@@ -51,6 +54,9 @@ namespace glob {
           if (name == "jet_deepCSVM_2016") return jet_deepCSVM_2016 ;
           if (name == "jet_deepCSVM_2017") return jet_deepCSVM_2017 ;
           if (name == "jet_deepCSVM_2018") return jet_deepCSVM_2018 ;
+          if (name == "jet_deepCSVT_2016") return jet_deepCSVT_2016 ;
+          if (name == "jet_deepCSVT_2017") return jet_deepCSVT_2017 ;
+          if (name == "jet_deepCSVT_2018") return jet_deepCSVT_2018 ;
           if (name == "jet_deepJetM_2016") return jet_deepJetM_2016 ;
           if (name == "jet_deepJetM_2017") return jet_deepJetM_2017 ;
           if (name == "jet_deepJetM_2018") return jet_deepJetM_2018 ;
@@ -77,6 +83,9 @@ namespace glob {
           if (name == "jet_deepCSVM_2016") jet_deepCSVM_2016 = val;
           if (name == "jet_deepCSVM_2017") jet_deepCSVM_2017 = val;
           if (name == "jet_deepCSVM_2018") jet_deepCSVM_2018 = val;
+          if (name == "jet_deepCSVT_2016") jet_deepCSVT_2016 = val;
+          if (name == "jet_deepCSVT_2017") jet_deepCSVT_2017 = val;
+          if (name == "jet_deepCSVT_2018") jet_deepCSVT_2018 = val;
           if (name == "jet_deepJetM_2016") jet_deepJetM_2016 = val;
           if (name == "jet_deepJetM_2017") jet_deepJetM_2017 = val;
           if (name == "jet_deepJetM_2018") jet_deepJetM_2018 = val;
@@ -99,6 +108,9 @@ namespace glob {
       float jet_deepCSVM_2016 ;
       float jet_deepCSVM_2017 ;
       float jet_deepCSVM_2018 ;
+      float jet_deepCSVT_2016 ;
+      float jet_deepCSVT_2017 ;
+      float jet_deepCSVT_2018 ;
       float jet_deepJetM_2016 ;
       float jet_deepJetM_2017 ;
       float jet_deepJetM_2018 ;
