@@ -20,7 +20,7 @@ public:
   virtual void Process(Reader* r) ;
   virtual void SlaveTerminate(Reader* r) {} ;
   virtual void Terminate(TList* mergedList, std::string outFileName) ;
-  virtual void Fill_btagEffi(std::vector<JetObj> jets, float w=1) ;
+  virtual void Fill_btagEffi(std::vector<JetObj> jets, std::string bTagWP="T", float w=1) ;
   virtual void FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_rec, float w_gen) ;
 private:
 
@@ -53,6 +53,8 @@ private:
   //Unfolding Plots
   UnfoldingPlots* h_zee_unfolding;
   UnfoldingPlots* h_zmm_unfolding;
+  UnfoldingPlots* h_zee_afterMET_unfolding;
+  UnfoldingPlots* h_zmm_afterMET_unfolding;
   
 
   TH1D* h_evt ;

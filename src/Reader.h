@@ -39,6 +39,8 @@ public :
    TTreeReaderArray<Float_t> Electron_mass = {fReader, "Electron_mass"};
    TTreeReaderArray<Int_t> Electron_charge = {fReader, "Electron_charge"};
    TTreeReaderArray<Int_t> Electron_cutBased = {fReader, "Electron_cutBased"};
+   TTreeReaderArray<Float_t> Electron_dxy = {fReader, "Electron_dxy"};
+   TTreeReaderArray<Float_t> Electron_dz = {fReader, "Electron_dz"};
    
    //reco muons
    TTreeReaderValue<UInt_t> nMuon = {fReader, "nMuon"};
@@ -51,6 +53,7 @@ public :
    TTreeReaderArray<Float_t> Muon_pfRelIso04_all = {fReader, "Muon_pfRelIso04_all"};
    TTreeReaderArray<Bool_t> Muon_looseId = {fReader, "Muon_looseId"};
    TTreeReaderArray<Bool_t> Muon_tightId = {fReader, "Muon_tightId"};
+   TTreeReaderArray<Bool_t> Muon_mediumId = {fReader, "Muon_mediumId"};
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
    TTreeReaderArray<Int_t> Muon_genPartIdx = {fReader, "Muon_genPartIdx"};
 #endif
@@ -122,6 +125,7 @@ public :
    TTreeReaderArray<Int_t> TrigObj_filterBits = {fReader, "TrigObj_filterBits"};
 
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+   TTreeReaderValue<Float_t> Pileup_nTrueInt = {fReader, "Pileup_nTrueInt"};
    TTreeReaderValue<Float_t> genWeight = {fReader, "genWeight"};
    TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader, "Jet_hadronFlavour"};
 #endif

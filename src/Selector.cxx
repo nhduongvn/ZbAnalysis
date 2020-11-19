@@ -55,18 +55,18 @@ void Selector::SetEleEffCorr(std::vector<std::string> fName_trig,std::string fNa
 //multiple inputs to deal with different SFs for different run periods 
 void Selector::SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<std::string> fName_ID, std::vector<std::string> fName_iso, std::vector<float> w_trig, std::vector<float> w_ID, std::vector<float> w_iso) {
   std::string trigN("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
-  std::string idN("NUM_TightID_DEN_genTracks_eta_pt_syst");
-  std::string isoN("NUM_TightRelIso_DEN_TightIDandIPCut_eta_pt_syst");
-  std::string isoN1("NUM_TightRelIso_DEN_TightIDandIPCut_eta_pt");//FIXME: only stat available for GH for 2016 legacy
+  std::string idN("NUM_MediumID_DEN_genTracks_eta_pt_syst");
+  std::string isoN("NUM_LooseRelIso_DEN_MediumID_eta_pt_syst");//FIXME Loose iso?
+  std::string isoN1("NUM_LooseRelIso_DEN_MediumID_eta_pt");//FIXME: only stat available for GH for 2016 legacy
 #if defined(MC_2017)
   trigN = "IsoMu27_PtEtaBins/abseta_pt_ratio";
-  idN = "NUM_TightID_DEN_genTracks_pt_abseta_syst";
-  isoN = "NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta_syst";
+  idN = "NUM_MediumID_DEN_genTracks_pt_abseta_syst";
+  isoN = "NUM_LooseRelIso_DEN_MediumID_pt_abseta_syst";
 #endif
 #if defined(MC_2018)
   trigN = "IsoMu24_PtEtaBins/abseta_pt_ratio";
-  idN = "NUM_TightID_DEN_TrackerMuons_pt_abseta_syst";
-  isoN = "NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta_syst";
+  idN = "NUM_MediumID_DEN_TrackerMuons_pt_abseta_syst";
+  isoN = "NUM_LooseRelIso_DEN_MediumID_pt_abseta_syst";
 #endif
   for(std::string fN : fName_trig) {
     TFile* f = new TFile(fN.c_str(),"READ");
@@ -93,11 +93,30 @@ void Selector::SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<s
   for(float w : w_ID) m_muonID_w.push_back(w) ;
 }
 
-float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string uncType) {
+void Selector::SetPileupSF(std::string fName_puSF) {
+  TFile* f = new TFile(fName_puSF.c_str(),"READ") ;
+  m_hSF_pu = (TH1D*)f->Get("pileup_ratio") ;
+  m_hSF_pu->SetDirectory(0);
+}
+
+float Selector::PileupSF(int nTrueInt) {
+  int iBin = m_hSF_pu->FindFixBin(nTrueInt) ;
+  return m_hSF_pu->GetBinContent(iBin); 
+}
+
+float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string jet_main_btagWP, std::string uncType) {
   //get calibration file
-  TH1D* hEff_b = (TH1D*)m_btagEffFile->Get(("b_pt_eff_"+m_year).c_str());
-  TH1D* hEff_c = (TH1D*)m_btagEffFile->Get(("c_pt_eff_"+m_year).c_str());
-  TH1D* hEff_l = (TH1D*)m_btagEffFile->Get(("l_pt_eff_"+m_year).c_str());
+  std::string bN = "b_pt_eff_"+m_year;
+  std::string cN = "c_pt_eff_"+m_year;
+  std::string lN = "l_pt_eff_"+m_year;
+  if (jet_main_btagWP.find("deepJet") != std::string::npos) {
+    bN = "bdj_pt_eff_"+m_year;
+    cN = "cdj_pt_eff_"+m_year;
+    lN = "ldj_pt_eff_"+m_year;
+  }
+  TH1D* hEff_b = (TH1D*)m_btagEffFile->Get(bN.c_str());
+  TH1D* hEff_c = (TH1D*)m_btagEffFile->Get(cN.c_str());
+  TH1D* hEff_l = (TH1D*)m_btagEffFile->Get(lN.c_str());
   float pMC(1.);
   float pData(1.);
   for (std::vector<JetObj>::iterator jetIt = jets.begin() ; jetIt != jets.end() ; ++jetIt) {
@@ -123,7 +142,7 @@ float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string uncType) {
                  jetPt
     );
     //pass b-tagging requirement
-    if (jetIt->m_deepCSV > CUTS.Get<float>("jet_deepCSVM_" + m_year)) {
+    if (jetIt->m_deepCSV > CUTS.Get<float>("jet_"+jet_main_btagWP+"_" + m_year)) {
       pData = pData*sf*eff ;
       pMC = pMC*eff ;
     }
