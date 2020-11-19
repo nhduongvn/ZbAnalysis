@@ -68,6 +68,7 @@ void SetParameters(std::string fName, glob::Parameters& para) {
         std::string name = cont_no_space[0] ;
         if (cont_no_space[2] == "int") para.Set(name, std::stoi(cont[1])) ;
         if (cont_no_space[2] == "float") para.Set(name, std::stof(cont_no_space[1])) ;
+        if (cont_no_space[2] == "string") para.SetStr(name, cont_no_space[1]) ;
       }
     }
 
@@ -189,6 +190,8 @@ int main(int argc, char *argv[]) {
   std::vector<float> lw_muonID;
   std::vector<float> lw_muonIso;
 
+  std::string fName_puSF;
+
 #if defined(MC_2016) || defined(DATA_2016)
   std::string fName_roc("CalibData/RoccoR2016.txt") ;
 #endif
@@ -212,10 +215,10 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef MC_2016
-  fName_btagSF = "CalibData/DeepJet_2016LegacySF_WP_V1.csv" ;
+  fName_btagSF = "CalibData/DeepCSV_2016LegacySF_WP_V1.csv" ;
   fName_eleTrig.push_back("CalibData/sf_ele_2016_trig_v5.root");
   fName_eleRecSF = "CalibData/EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root" ;
-  fName_eleIDSF = "CalibData/2016LegacyReReco_ElectronLoose_Fall17V2.root" ;
+  fName_eleIDSF = "CalibData/2016LegacyReReco_ElectronTight_Fall17V2.root" ;
   lw_eleTrig.push_back(1.0);//FIXME for place holder
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_RunBtoF_trigger_2016_muon.root");
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_Period4_trigger_mu2016_muon.root");
@@ -229,12 +232,14 @@ int main(int argc, char *argv[]) {
   fName_muonIso.push_back("CalibData/RunGH_SF_ISO_2016_muon.root");
   lw_muonIso.push_back(0.5);//FIXME
   lw_muonIso.push_back(0.5);//FIXME
+
+  fName_puSF = "CalibData/2016_pileup_ratio.root";
 #endif
 #ifdef MC_2017
   fName_btagSF = "CalibData/DeepCSV_94XSF_WP_V4_B_F.csv";
   fName_eleTrig.push_back("CalibData/sf_ele_2017_trig_v5.root");
   fName_eleRecSF = "CalibData/egammaEffi.txt_EGM2D_runBCDEF_passingRECO_2017.root";
-  fName_eleIDSF = "CalibData/2017_ElectronLoose.root";
+  fName_eleIDSF = "CalibData/2017_ElectronTight.root";
   lw_eleTrig.push_back(1.0);//FIXME for place holder
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_RunBtoF_Nov17Nov2017_trigger_muon.root");
   lw_muonTrig.push_back(1.);
@@ -242,12 +247,14 @@ int main(int argc, char *argv[]) {
   lw_muonID.push_back(1.);
   fName_muonIso.push_back("CalibData/RunBCDEF_SF_ISO_syst_2017_muon.root");
   lw_muonIso.push_back(1.);
+
+  fName_puSF = "CalibData/2017_pileup_ratio.root";
 #endif
 #ifdef MC_2018
   fName_btagSF = "CalibData/DeepCSV_102XSF_WP_V1.csv";
   fName_eleTrig.push_back("CalibData/sf_ele_2018_trig_v5.root");
   fName_eleRecSF = "CalibData/egammaEffi.txt_EGM2D_updatedAll_2018.root";
-  fName_eleIDSF = "CalibData/2018_ElectronLoose.root";
+  fName_eleIDSF = "CalibData/2018_ElectronTight.root";
   lw_eleTrig.push_back(1.0);//FIXME for place holder
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_2018Data_BeforeMuonHLTUpdate_trigger_muon.root");
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_2018Data_AfterMuonHLTUpdate_trigger_muon.root");
@@ -257,12 +264,18 @@ int main(int argc, char *argv[]) {
   lw_muonID.push_back(1.);
   fName_muonIso.push_back("CalibData/RunABCD_SF_ISO_2018_muon.root");
   lw_muonIso.push_back(1.);
+
+  fName_puSF = "CalibData/2018_pileup_ratio.root";
 #endif
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
   sel.SetRandom() ; //used for muon rochestor correction (used when correcting for MC)
-  sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/eff.root");
+  if (CUTS.GetStr("jet_main_btagWP")=="deepCSVT") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effT.root");
+  if (CUTS.GetStr("jet_main_btagWP")=="deepJetT") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effT.root");
+  if (CUTS.GetStr("jet_main_btagWP")=="deepCSVM") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effM.root");
+  if (CUTS.GetStr("jet_main_btagWP")=="deepJetM") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effM.root");
   sel.SetEleEffCorr(fName_eleTrig,fName_eleRecSF,fName_eleIDSF,lw_eleTrig);
   sel.SetMuonEffCorr(fName_muonTrig,fName_muonID,fName_muonIso,lw_muonTrig,lw_muonID,lw_muonIso);
+  sel.SetPileupSF(fName_puSF);
 #endif
   sel.SetRochesterCorr(fName_roc) ;
 #if defined(DATA_2016) || defined(DATA_2017) || defined(DATA_2018)
