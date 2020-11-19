@@ -6,9 +6,15 @@ ZMassH   111 float
 //cuts for leptons used in overlap removal
 lep_jetOverlap_pt 25 float
 lep_jetOverlap_eta 2.5 float
-muon_iso 0.15 float
+ele_dz_b 0.1  float
+ele_dz_e 0.2  float
+ele_d0_b 0.05 float
+ele_d0_e 0.1  float
+//Medium isolation https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Particle_Flow_isolation
+muon_iso 0.2 float
 jet_eta 2.4 float
 jet_pt  30  float
+jet_main_btagWP   deepCSVT string
 jet_deepCSVM_2016 0.6321 float
 jet_deepCSVM_2017 0.4941 float
 jet_deepCSVM_2018 0.4184 float
@@ -18,3 +24,7 @@ jet_deepCSVT_2018 0.7527 float
 jet_deepJetM_2016 0.3093 float
 jet_deepJetM_2017 0.3033 float
 jet_deepJetM_2018 0.2770 float
+jet_deepJetT_2016 0.7221 float
+jet_deepJetT_2017 0.7489 float
+jet_deepJetT_2018 0.7264 float
+MET 50.0 float
