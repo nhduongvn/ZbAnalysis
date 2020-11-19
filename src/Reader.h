@@ -94,6 +94,8 @@ public :
    TTreeReaderArray<Float_t> Jet_btagDeepB = {fReader, "Jet_btagDeepB"};
    TTreeReaderArray<Float_t> Jet_btagDeepFlavB = {fReader, "Jet_btagDeepFlavB"};
    TTreeReaderArray<Int_t> Jet_jetId = {fReader, "Jet_jetId"};
+   //FIXME turn this on for v7
+   //TTreeReaderArray<Float_t> Jet_puIdDisc = {fReader, "Jet_puIdDisc"};
 
    //MET 
    TTreeReaderValue<Float_t> MET_pt = {fReader, "MET_pt"};

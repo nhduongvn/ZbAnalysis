@@ -406,7 +406,7 @@ void ZbSelection::Process(Reader* r) {
     h_Jet_cutflow->Fill(5) ;
     
     //FIXME: turn this on for v7
-    if (jet.m_lvec.Pt()<50 && jet.m_lvec.Pt()>30 && (r->Jet_puIdDisc)[i]<0.61 ) continue;
+    //if (jet.m_lvec.Pt()<50 && jet.m_lvec.Pt()>30 && (r->Jet_puIdDisc)[i]<0.61 ) continue;
     h_Jet_cutflow->Fill(6) ;
 	  
     jets.push_back(jet) ;
