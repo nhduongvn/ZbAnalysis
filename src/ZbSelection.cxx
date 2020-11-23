@@ -210,12 +210,17 @@ void ZbSelection::Process(Reader* r) {
   //Weights
   float genWeight = 1.;
   float puSF = 1.;
+  float l1preW = 1.;
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
   if (*(r->genWeight) < 0) genWeight = -1. ;
   if (*(r->genWeight) == 0) h_evt->Fill(0) ; 
   if (*(r->genWeight) < 0) h_evt->Fill(-1) ; 
   if (*(r->genWeight) > 0) h_evt->Fill(1) ;
   puSF = PileupSF(*(r->Pileup_nTrueInt));
+#endif
+
+#if defined(MC_2016) || defined(MC_2017)
+  l1preW = *(r->L1PreFiringWeight_Nom);  
 #endif
 
 #if defined(DATA_2016) || defined(DATA_2017) || defined(DATA_2018)
@@ -226,7 +231,7 @@ void ZbSelection::Process(Reader* r) {
 
   float evtW = 1. ;
   
-  if (!m_isData) evtW *= genWeight*puSF;
+  if (!m_isData) evtW *= genWeight*puSF*l1preW;
 
   //Gen events
   //Z+2bjets
@@ -406,7 +411,7 @@ void ZbSelection::Process(Reader* r) {
     h_Jet_cutflow->Fill(5) ;
     
     //FIXME: turn this on for v7
-    //if (jet.m_lvec.Pt()<50 && jet.m_lvec.Pt()>30 && (r->Jet_puIdDisc)[i]<0.61 ) continue;
+    if (jet.m_lvec.Pt()<50 && jet.m_lvec.Pt()>30 && (r->Jet_puIdDisc)[i]<0.61 ) continue;
     h_Jet_cutflow->Fill(6) ;
 	  
     jets.push_back(jet) ;

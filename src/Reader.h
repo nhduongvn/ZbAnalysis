@@ -29,6 +29,12 @@ public :
    TTreeReaderValue<UInt_t> run = {fReader, "run"};
    TTreeReaderValue<UInt_t> luminosityBlock = {fReader, "luminosityBlock"};
 #endif
+
+#if defined(MC_2016) || defined(MC_2017)
+   TTreeReaderValue<Float_t> L1PreFiringWeight_Dn = {fReader, "L1PreFiringWeight_Dn"};
+   TTreeReaderValue<Float_t> L1PreFiringWeight_Nom = {fReader, "L1PreFiringWeight_Nom"};
+   TTreeReaderValue<Float_t> L1PreFiringWeight_Up = {fReader, "L1PreFiringWeight_Up"};
+#endif
    
    //reco electrons
    TTreeReaderValue<UInt_t> nElectron = {fReader, "nElectron"};
@@ -95,7 +101,7 @@ public :
    TTreeReaderArray<Float_t> Jet_btagDeepFlavB = {fReader, "Jet_btagDeepFlavB"};
    TTreeReaderArray<Int_t> Jet_jetId = {fReader, "Jet_jetId"};
    //FIXME turn this on for v7
-   //TTreeReaderArray<Float_t> Jet_puIdDisc = {fReader, "Jet_puIdDisc"};
+   TTreeReaderArray<Float_t> Jet_puIdDisc = {fReader, "Jet_puIdDisc"};
 
    //MET 
    TTreeReaderValue<Float_t> MET_pt = {fReader, "MET_pt"};
