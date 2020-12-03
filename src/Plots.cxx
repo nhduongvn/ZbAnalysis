@@ -27,6 +27,7 @@ class ZbPlots
 
   public:
     ZbPlots(TString name) : m_name(name) {
+      //FIXME add ptZ
       h_pt_lep0 = new TH1D(name + "_pt_lep0","",200,0,200) ;
       h_phi_lep0 = new TH1D(name + "_phi_lep0","",400,-4.0,4.0) ;
       h_eta_lep0 = new TH1D(name + "_eta_lep0","",300,-3.0,3.0) ;
@@ -354,19 +355,31 @@ class UnfoldingPlots
      float xBins_pt_rec_Z[nBins_pt_rec_Z] = {0,20,30,40,50,60,70,90,120,150,200};
      unsigned nBins_pt_gen_Z(6);
      float xBins_pt_gen_Z[nBins_pt_gen_Z] = {0,30,50,70,90,150,200};
+     //unsigned nBins_dR_rec_bb(14);
+     //float xBins_dR_rec_bb[nBins_dR_rec_bb] = {0.4,0.8,1.2,1.6,2,2.4,2.8,3,3.2,3.4,3.6,4.0,4.4,5,6};
+     //float xBins_dR_rec_bb[nBins_dR_rec_bb] = {0.4,1.0,1.6,2,2.4,2.8,3,3.2,3.4,3.6,4.0,4.4,5,6};
+     //unsigned nBins_dR_gen_bb(14);
+     //float xBins_dR_gen_bb[nBins_dR_gen_bb] = {0.4,1.2,2.0,2.4,2.8,3.2,3.4,3.6,4.4,5,6};
+
      h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
      h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_UFOFGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b)); //rec match with underflow or overflow gen
      h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
      h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_UFOFGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
      h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_all_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
      h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_noGenMatch_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
+     h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_UFOFGenMatch_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
 
      h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_all_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
      h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_noRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_UFOFRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b)); //gen match with underflow or overflow gen
      h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_all_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
      h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_noRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_UFOFRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
      h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_all_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
      h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_noRecMatch_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
+     h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_UFOFRecMatch_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
      
      h_pt_res_b1 = new TH2D("pt_res_b1_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b, nBins_pt_rec_b, xBins_pt_rec_b);
      h_pt_res_b2 = new TH2D("pt_res_b2_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b, nBins_pt_rec_b, xBins_pt_rec_b);
@@ -408,12 +421,29 @@ class UnfoldingPlots
       }
     }
     
-    void FillRes(TLorentzVector rec_l1, TLorentzVector rec_l2, TLorentzVector rec_b1, TLorentzVector rec_b2, TLorentzVector gen_l1, TLorentzVector gen_l2, TLorentzVector gen_b1, TLorentzVector gen_b2, float w) {
+    void FillUFOF(double y_rec, double x_gen, TH2D* hRes, TH1D* hRec, TH1D* hGen, float rec_w, float gen_w) {
+      //uf and of rec 
+      float yaxis_L = hRes->GetYaxis()->GetBinLowEdge(1);
+      float yaxis_H = hRes->GetYaxis()->GetBinLowEdge(hRes->GetNbinsY()+1);
+      float xaxis_L = hRes->GetXaxis()->GetBinLowEdge(1);
+      float xaxis_H = hRes->GetXaxis()->GetBinLowEdge(hRes->GetNbinsX()+1);
+      if (y_rec < yaxis_L || y_rec >= yaxis_H) { //consider OF and UF as no rec found
+        hGen->Fill(x_gen,gen_w);
+      }
+      if (x_gen < xaxis_L || x_gen >= xaxis_H) {
+        hRec->Fill(y_rec,rec_w*gen_w);
+      }
+    }
+
+    void FillRes(TLorentzVector rec_l1, TLorentzVector rec_l2, TLorentzVector rec_b1, TLorentzVector rec_b2, TLorentzVector gen_l1, TLorentzVector gen_l2, TLorentzVector gen_b1, TLorentzVector gen_b2, float rec_w, float gen_w) {
       TLorentzVector rec_Z = rec_l1 + rec_l2;
       TLorentzVector gen_Z = gen_l1 + gen_l2;
-      h_pt_res_b1->Fill(gen_b1.Pt(),rec_b1.Pt(),w);
-      h_pt_res_b2->Fill(gen_b2.Pt(),rec_b2.Pt(),w);
-      h_pt_res_Z->Fill(gen_Z.Pt(),rec_Z.Pt(),w);
+      FillUFOF(rec_b1.Pt(),gen_b1.Pt(),h_pt_res_b1,h_pt_rec_b1[2],h_pt_gen_b1[2],rec_w,gen_w); 
+      FillUFOF(rec_b2.Pt(),gen_b2.Pt(),h_pt_res_b2,h_pt_rec_b2[2],h_pt_gen_b2[2],rec_w,gen_w); 
+      FillUFOF(rec_Z.Pt(),gen_Z.Pt(),h_pt_res_Z,h_pt_rec_Z[2],h_pt_gen_Z[2],rec_w,gen_w); 
+      h_pt_res_b1->Fill(gen_b1.Pt(),rec_b1.Pt(),rec_w*gen_w);
+      h_pt_res_b2->Fill(gen_b2.Pt(),rec_b2.Pt(),rec_w*gen_w);
+      h_pt_res_Z->Fill(gen_Z.Pt(),rec_Z.Pt(),rec_w*gen_w);
     }
 
     std::vector<TH1*> returnHisto() {

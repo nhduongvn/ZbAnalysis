@@ -221,6 +221,7 @@ void ZbSelection::Process(Reader* r) {
 
 #if defined(MC_2016) || defined(MC_2017)
   l1preW = *(r->L1PreFiringWeight_Nom);  
+  //std::cout << "\nPrefiring: " << l1preW;
 #endif
 
 #if defined(DATA_2016) || defined(DATA_2017) || defined(DATA_2018)

@@ -24,8 +24,10 @@ mydict:
 	@rootcint Reader_dict.cxx -c src/Reader.h
 	@rootcint Processor_dict.cxx -c src/Processor.h
 
-main:	Ana.cxx Global.o Reader.o Processor.o BTagCalibrationStandalone.o Reader_dict.o Processor_dict.o Selector.o ZbSelection.o
-	$(CXX) $(CXXFLAGS) $(ROOTGLIBS) $^ -o $@
+main:	Ana.cxx Global.o Reader.o Processor.o RoccoR.o BTagCalibrationStandalone.o LumiMaskFilter.o Reader_dict.o Processor_dict.o Selector.o ZbSelection.o
+	#$(CXX) $(CXXFLAGS) $(ROOTGLIBS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $(ROOTGLIBS) $^ -o $@ yaml-cpp/build/libyaml-cpp.a
+
 #main:	Ana.cxx Global.o Reader.o Processor.o Reader_dict.o Processor_dict.o Selector.o ZbSelection.o
 #	$(CXX) $(CXXFLAGS) $(ROOTGLIBS) $^ -o $@
 
@@ -44,6 +46,10 @@ main:	Ana.cxx Global.o Reader.o Processor.o BTagCalibrationStandalone.o Reader_d
 %.o:	src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
+%.o:	src/%.cc
+	#$(CXX) $(CXXFLAGS) -I yaml-cpp/include -lyaml-cpp -c $^ -o $@
+	$(CXX) $(CXXFLAGS) -I yaml-cpp/include -c $^ -o $@
+
 %.o:	%.cxx
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
@@ -58,6 +64,9 @@ Reader_dict.o: Reader_dict.cxx
 
 Processor_dict.o: Processor_dict.cxx
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
+
+#LumiMaskFilter1.o: LumiMaskFilter.cc
+#	$(CXX) $(CXXFLAGS) -I yaml-cpp/include -lyaml-cpp -c $^ -o $@
 
 clean:
 	rm -rf *.o *.so *_dict.cxx

@@ -56,17 +56,17 @@ void Selector::SetEleEffCorr(std::vector<std::string> fName_trig,std::string fNa
 void Selector::SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<std::string> fName_ID, std::vector<std::string> fName_iso, std::vector<float> w_trig, std::vector<float> w_ID, std::vector<float> w_iso) {
   std::string trigN("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
   std::string idN("NUM_MediumID_DEN_genTracks_eta_pt_syst");
-  std::string isoN("NUM_LooseRelIso_DEN_MediumID_eta_pt_syst");//FIXME Loose iso?
-  std::string isoN1("NUM_LooseRelIso_DEN_MediumID_eta_pt");//FIXME: only stat available for GH for 2016 legacy
+  std::string isoN("NUM_TightRelIso_DEN_MediumID_eta_pt_syst");//FIXME tight iso?
+  std::string isoN1("NUM_TightRelIso_DEN_MediumID_eta_pt");//FIXME: only stat available for GH for 2016 legacy
 #if defined(MC_2017)
   trigN = "IsoMu27_PtEtaBins/abseta_pt_ratio";
   idN = "NUM_MediumID_DEN_genTracks_pt_abseta_syst";
-  isoN = "NUM_LooseRelIso_DEN_MediumID_pt_abseta_syst";
+  isoN = "NUM_TightRelIso_DEN_MediumID_pt_abseta_syst";
 #endif
 #if defined(MC_2018)
   trigN = "IsoMu24_PtEtaBins/abseta_pt_ratio";
   idN = "NUM_MediumID_DEN_TrackerMuons_pt_abseta_syst";
-  isoN = "NUM_LooseRelIso_DEN_MediumID_pt_abseta_syst";
+  isoN = "NUM_TightRelIso_DEN_MediumID_pt_abseta_syst";
 #endif
   for(std::string fN : fName_trig) {
     TFile* f = new TFile(fN.c_str(),"READ");
