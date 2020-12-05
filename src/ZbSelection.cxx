@@ -761,10 +761,15 @@ void ZbSelection::Process(Reader* r) {
   //FillUnfolding(zee_rec_uf,zee_gen_uf,h_zee_unfolding,w_zee_rec_uf,genWeight); 
   //FillUnfolding(zmm_rec_uf,zmm_gen_uf,h_zmm_unfolding,w_zmm_rec_uf,genWeight); 
   //For MC validation turn rec SF off
-  FillUnfolding(zee_rec_uf,zee_gen_uf,h_zee_unfolding,1.0,genWeight); 
-  FillUnfolding(zmm_rec_uf,zmm_gen_uf,h_zmm_unfolding,1.0,genWeight); 
-  FillUnfolding(zee_rec_afterMET_uf,zee_gen_uf,h_zee_afterMET_unfolding,1.0,genWeight); 
-  FillUnfolding(zmm_rec_afterMET_uf,zmm_gen_uf,h_zmm_afterMET_unfolding,1.0,genWeight); 
+  //TEMP
+  //w_zee_rec_uf = genWeight;
+  //w_zmm_rec_uf = genWeight;
+  //w_zee_rec_afterMET_uf = genWeight;
+  //w_zmm_rec_afterMET_uf = genWeight;
+  FillUnfolding_1(zee_rec_uf,zee_gen_uf,h_zee_unfolding,w_zee_rec_uf,genWeight); 
+  FillUnfolding_1(zmm_rec_uf,zmm_gen_uf,h_zmm_unfolding,w_zmm_rec_uf,genWeight); 
+  FillUnfolding_1(zee_rec_afterMET_uf,zee_gen_uf,h_zee_afterMET_unfolding,w_zee_rec_afterMET_uf,genWeight); 
+  FillUnfolding_1(zmm_rec_afterMET_uf,zmm_gen_uf,h_zmm_afterMET_unfolding,w_zmm_rec_afterMET_uf,genWeight); 
 #endif
 
   return;
@@ -836,13 +841,13 @@ void ZbSelection::Fill_btagEffi(std::vector<JetObj> jets, std::string bTagWP, fl
 }
 
 //Fill unfolding plots
-void ZbSelection::FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_rec, float w_gen) {
+void ZbSelection::FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_all, float w_gen) {
   //has reco
   if (recs.size()==4) {
-    h->Fill("REC_ALL",recs[0],recs[1],recs[2],recs[3],w_rec*w_gen);
+    h->Fill("REC_ALL",recs[0],recs[1],recs[2],recs[3],w_all);
     if (gens.size()!=4) { //has reco but no gen
       //std::cout << "\n Has reco, gens.size != 4" << gens.size();
-      h->Fill("REC_NOGENMATCH",recs[0],recs[1],recs[2],recs[3],w_rec*w_gen);
+      h->Fill("REC_NOGENMATCH",recs[0],recs[1],recs[2],recs[3],w_all);
     }
     else { //has gen
       float dR1 = std::min(recs[0].DeltaR(gens[0]),recs[0].DeltaR(gens[1]));
@@ -851,11 +856,11 @@ void ZbSelection::FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TL
       float dR4 = std::min(recs[3].DeltaR(gens[2]),recs[3].DeltaR(gens[3]));
       if (dR1 > 0.2 || dR2 > 0.2 || dR3 > 0.2 || dR4 > 0.2) { //no matching found fill bkgr
         //std::cout << "\n Has reco, has gen, fail dR" << gens.size();
-        h->Fill("REC_NOGENMATCH",recs[0],recs[1],recs[2],recs[3],w_rec*w_gen);
+        h->Fill("REC_NOGENMATCH",recs[0],recs[1],recs[2],recs[3],w_all);
       }
       else { //matching found fill response matrix
         //std::cout << "\n Has reco, has gen, pass dR" << gens.size();
-        h->FillRes(recs[0],recs[1],recs[2],recs[3],gens[0],gens[1],gens[2],gens[3],w_rec,w_gen);
+        h->FillRes(recs[0],recs[1],recs[2],recs[3],gens[0],gens[1],gens[2],gens[3],w_all,w_gen);
       }
     }
   }
@@ -871,6 +876,39 @@ void ZbSelection::FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TL
       float dR4 = std::min(gens[3].DeltaR(recs[2]),gens[3].DeltaR(recs[3]));
       if (dR1 > 0.2 || dR2 > 0.2 || dR3 > 0.2 || dR4 > 0.2) { //no matching found fill efficiency 
         h->Fill("GEN_NORECMATCH",gens[0],gens[1],gens[2],gens[3],w_gen);
+      }
+    }
+  }
+}
+
+
+//Fill unfolding plots
+void ZbSelection::FillUnfolding_1(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_all, float w_gen) {
+  //has reco
+  if (recs.size()==4) {
+    h->Fill("REC_ALL",recs[0],recs[1],recs[2],recs[3],w_all);
+    if (gens.size()==4) {
+      float dR1 = std::min(recs[0].DeltaR(gens[0]),recs[0].DeltaR(gens[1]));
+      float dR2 = std::min(recs[1].DeltaR(gens[0]),recs[1].DeltaR(gens[1]));
+      float dR3 = std::min(recs[2].DeltaR(gens[2]),recs[2].DeltaR(gens[3]));
+      float dR4 = std::min(recs[3].DeltaR(gens[2]),recs[3].DeltaR(gens[3]));
+      if (dR1 < 0.2 && dR2 < 0.2 && dR3 < 0.2 && dR4 < 0.2) { //found rec matching with gen 
+        //std::cout << "\n Has reco, has gen, fail dR" << gens.size();
+        h->Fill("REC_GENMATCH",recs[0],recs[1],recs[2],recs[3],w_all);
+        h->FillRes(recs[0],recs[1],recs[2],recs[3],gens[0],gens[1],gens[2],gens[3],w_all,w_gen);
+      }
+    }
+  }
+
+  if (gens.size()==4) { //has gen
+    h->Fill("GEN_ALL",gens[0],gens[1],gens[2],gens[3],w_gen);
+    if (recs.size()==4) { //gen match with reco
+      float dR1 = std::min(gens[0].DeltaR(recs[0]),gens[0].DeltaR(recs[1]));
+      float dR2 = std::min(gens[1].DeltaR(recs[0]),gens[1].DeltaR(recs[1]));
+      float dR3 = std::min(gens[2].DeltaR(recs[2]),gens[2].DeltaR(recs[3]));
+      float dR4 = std::min(gens[3].DeltaR(recs[2]),gens[3].DeltaR(recs[3]));
+      if (dR1 < 0.2 && dR2 < 0.2 && dR3 < 0.2 && dR4 < 0.2) { //matching found fill efficiency 
+        h->Fill("GEN_RECMATCH",gens[0],gens[1],gens[2],gens[3],w_all); //weights by w_all since match with reco
       }
     }
   }

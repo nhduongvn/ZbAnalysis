@@ -21,7 +21,8 @@ public:
   virtual void SlaveTerminate(Reader* r) {} ;
   virtual void Terminate(TList* mergedList, std::string outFileName) ;
   virtual void Fill_btagEffi(std::vector<JetObj> jets, std::string bTagWP="T", float w=1) ;
-  virtual void FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_rec, float w_gen) ;
+  virtual void FillUnfolding(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_all, float w_gen) ;
+  virtual void FillUnfolding_1(std::vector<TLorentzVector> recs, std::vector<TLorentzVector> gens, UnfoldingPlots* h, float w_all, float w_gen) ;
 private:
 
   //histograms
