@@ -29,7 +29,9 @@ private:
   ZbPlots* h_zee_jet ;
   ZbPlots* h_zmm_jet ;
   ZbPlots* h_zee_bjet ;
+  ZbPlots* h_zee_bjet_afterMET ;
   ZbPlots* h_zmm_bjet ;
+  ZbPlots* h_zmm_bjet_afterMET ;
   Z2bPlots* h_zee_2bjet ;
   Z2bPlots* h_zee_2bjet_bb ;
   Z2bPlots* h_zee_2bjet_bX ;

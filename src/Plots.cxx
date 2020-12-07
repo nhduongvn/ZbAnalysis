@@ -8,6 +8,22 @@
 #include "TMath.h"
 #include "TLorentzVector.h"
 
+const unsigned NBIN_PT_JET = 300; 
+const float X_PT_JET[2] = {0,300};
+const unsigned NBIN_PT_Z = 300;
+const float X_PT_Z[2] = {0,300};
+const unsigned NBIN_DR_2B = 100;
+const float X_DR_2B[2] = {0,10};
+const unsigned NBIN_DPHI_2B = 60;
+const float X_DPHI_2B[2] = {0,TMath::Pi()};
+const unsigned NBIN_DRMIN_Z2B = 100;
+const float X_DRMIN_Z2B[2] = {0,10};
+const unsigned NBIN_A_Z2B = 100;
+const float X_A_Z2B[2] = {0,1};
+const unsigned NBIN_M_2B = 500;
+const float X_M_2B[2] = {0,500};
+const unsigned NBIN_M_Z2B = 600;
+const float X_M_Z2B[2] = {0,600};
 
 class ZbPlots 
 {
@@ -69,7 +85,7 @@ class ZbPlots
       h_deltaPhiAlgo_lep1->Sumw2() ;
       h_deltaEtaAlgo_lep1->Sumw2() ;
 
-      h_pt_jet = new TH1D(name + "_pt_jet","",300,0,300) ;
+      h_pt_jet = new TH1D(name + "_pt_jet","",NBIN_PT_JET,X_PT_JET[0],X_PT_JET[1]) ;
       h_phi_jet = new TH1D(name + "_phi_jet","",400,-4.0,4.0) ;
       h_eta_jet = new TH1D(name + "_eta_jet","",300,-3.0,3.0) ;
       h_mSV_jet = new TH1D(name + "_mSV_jet","",100,0,10) ;
@@ -80,7 +96,7 @@ class ZbPlots
       h_Njet->Sumw2() ;
       h_mSV_jet->Sumw2();
 
-      h_pt_dilepton = new TH1D(name + "_pt_dilepton","",300,0,300) ;
+      h_pt_dilepton = new TH1D(name + "_pt_dilepton","",NBIN_PT_Z,X_PT_Z[0],X_PT_Z[1]) ;
       h_phi_dilepton = new TH1D(name + "_phi_dilepton","",400,-4.0,4.0) ;
       h_eta_dilepton = new TH1D(name + "_eta_dilepton","",300,-3.0,3.0) ;
       h_pt_dilepton->Sumw2() ;
@@ -211,21 +227,21 @@ class Z2bPlots : public ZbPlots{
   
   public: 
     Z2bPlots(TString name) : ZbPlots(name) {
-      h_pt_jet1 = new TH1D(name + "_pt_jet1","",300,0,300) ;
+      h_pt_jet1 = new TH1D(name + "_pt_jet1","",NBIN_PT_JET,X_PT_JET[0],X_PT_JET[1]) ;
       h_phi_jet1 = new TH1D(name + "_phi_jet1","",400,-4.0,4.0) ;
       h_eta_jet1 = new TH1D(name + "_eta_jet1","",300,-3.0,3.0) ;
       h_mSV_jet1 = new TH1D(name + "_mSV_jet1","",100,0,10) ;
-      h_m_2b = new TH1D(name + "_m_2b","",500,0,500) ;
-      h_m_Z2b = new TH1D(name + "_m_Z2b","",500,0,500) ;
-      h_dR_2b = new TH1D(name + "_dR_2b","",100,0,10) ;
-      h_dPhi_2b = new TH1D(name + "_dPhi_2b","",60,0,TMath::Pi()) ;
+      h_m_2b = new TH1D(name + "_m_2b","",NBIN_M_2B,X_M_2B[0],X_M_2B[1]) ;
+      h_m_Z2b = new TH1D(name + "_m_Z2b","",NBIN_M_Z2B,X_M_Z2B[0],X_M_Z2B[1]) ;
+      h_dR_2b = new TH1D(name + "_dR_2b","",NBIN_DR_2B,X_DR_2B[0],X_DR_2B[1]) ;
+      h_dPhi_2b = new TH1D(name + "_dPhi_2b","",NBIN_DPHI_2B,X_DPHI_2B[0],X_DPHI_2B[1]) ;
       h_dR_Zb = new TH1D(name + "_dR_Zb","",100,0,10) ;
       h_dPhi_Zb = new TH1D(name + "_dPhi_Zb","",60,0,TMath::Pi()) ;
       h_dR_Zb1 = new TH1D(name + "_dR_Zb1","",100,0,10) ;
       h_dPhi_Zb1 = new TH1D(name + "_dPhi_Zb1","",60,0,TMath::Pi()) ;
-      h_dRmin_Z2b = new TH1D(name + "_dRmin_Z2b","",100,0,10) ;
+      h_dRmin_Z2b = new TH1D(name + "_dRmin_Z2b","",NBIN_DRMIN_Z2B,X_DRMIN_Z2B[0],X_DRMIN_Z2B[1]) ;
       h_dRmax_Z2b = new TH1D(name + "_dRmax_Z2b","",100,0,10) ;
-      h_A_Z2b = new TH1D(name + "_A_Z2b","",100,0,1) ;
+      h_A_Z2b = new TH1D(name + "_A_Z2b","",NBIN_A_Z2B,X_A_Z2B[0],X_A_Z2B[1]) ;
       h_pt_Z2b = new TH1D(name + "_pt_Z2b","",300,0,300) ;
 
       h_pt_jet1->Sumw2() ;
@@ -351,90 +367,222 @@ class UnfoldingPlots
      float xBins_pt_rec_b[nBins_pt_rec_b] = {30, 35, 40, 50, 60, 70, 90, 110, 130, 150, 200};
      unsigned nBins_pt_gen_b(6) ;
      float xBins_pt_gen_b[nBins_pt_gen_b] = {30, 40, 50, 70, 110, 150, 200};
-     unsigned nBins_pt_rec_Z(10);
-     float xBins_pt_rec_Z[nBins_pt_rec_Z] = {0,20,30,40,50,60,70,90,120,150,200};
-     unsigned nBins_pt_gen_Z(6);
-     float xBins_pt_gen_Z[nBins_pt_gen_Z] = {0,30,50,70,90,150,200};
+     unsigned nBins_pt_Z_rec(10);
+     float xBins_pt_Z_rec[nBins_pt_Z_rec] = {0,20,30,40,50,60,70,90,120,150,200};
+     unsigned nBins_pt_Z_gen(6);
+     float xBins_pt_Z_gen[nBins_pt_Z_gen] = {0,30,50,70,90,150,200};
+
+     unsigned nBin_pt_b(170);
+     float x_pt_b[2]={30,200};
+     unsigned nBin_pt_Z(200);
+     float x_pt_Z[2]={0,200};
+     unsigned nBin_dR_2b(46);
+     float x_dR_2b[2]={0.4,5};
+     unsigned nBin_dPhi_2b(60);
+     float x_dPhi_2b[2]={0,TMath::Pi()};
+     unsigned nBin_dRmin_Z2b(50);
+     float x_dRmin_Z2b[2]={0,5};
+     unsigned nBin_A_Z2b = 100;
+     float x_A_Z2b[2] = {0,1};
+     unsigned nBin_m_2b = 480;
+     float x_m_2b[2] = {20,500};
+     unsigned nBin_m_Z2b = 450;
+     float x_m_Z2b[2] = {150,600};
+
      //unsigned nBins_dR_rec_bb(14);
      //float xBins_dR_rec_bb[nBins_dR_rec_bb] = {0.4,0.8,1.2,1.6,2,2.4,2.8,3,3.2,3.4,3.6,4.0,4.4,5,6};
      //float xBins_dR_rec_bb[nBins_dR_rec_bb] = {0.4,1.0,1.6,2,2.4,2.8,3,3.2,3.4,3.6,4.0,4.4,5,6};
      //unsigned nBins_dR_gen_bb(14);
      //float xBins_dR_gen_bb[nBins_dR_gen_bb] = {0.4,1.2,2.0,2.4,2.8,3.2,3.4,3.6,4.4,5,6};
+/*
+     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_GenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_UFOFGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b)); //rec match with underflow or overflow gen
+     h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_GenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_UFOFGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+     h_pt_Z_rec.push_back(new TH1D("pt_Z_rec_all_" + name, "", nBins_pt_Z_rec, xBins_pt_Z_rec));
+     h_pt_Z_rec.push_back(new TH1D("pt_Z_rec_GenMatch_" + name, "", nBins_pt_Z_rec, xBins_pt_Z_rec));
+     h_pt_Z_rec.push_back(new TH1D("pt_Z_rec_noGenMatch_" + name, "", nBins_pt_Z_rec, xBins_pt_Z_rec));
+     h_pt_Z_rec.push_back(new TH1D("pt_Z_rec_UFOFGenMatch_" + name, "", nBins_pt_Z_rec, xBins_pt_Z_rec));
 
-     h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
-     h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_GenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
-     h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
-     h_pt_rec_b1.push_back(new TH1D("pt_rec_b1_UFOFGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b)); //rec match with underflow or overflow gen
-     h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
-     h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_GenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
-     h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
-     h_pt_rec_b2.push_back(new TH1D("pt_rec_b2_UFOFGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
-     h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_all_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
-     h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_GenMatch_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
-     h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_noGenMatch_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
-     h_pt_rec_Z.push_back(new TH1D("pt_rec_Z_UFOFGenMatch_" + name, "", nBins_pt_rec_Z, xBins_pt_rec_Z));
-
-     h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_all_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
-     h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_RecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
-     h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_noRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
-     h_pt_gen_b1.push_back(new TH1D("pt_gen_b1_UFOFRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b)); //gen match with underflow or overflow gen
-     h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_all_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
-     h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_RecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
-     h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_noRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
-     h_pt_gen_b2.push_back(new TH1D("pt_gen_b2_UFOFRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
-     h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_all_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
-     h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_RecMatch_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
-     h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_noRecMatch_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
-     h_pt_gen_Z.push_back(new TH1D("pt_gen_Z_UFOFRecMatch_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z));
+     h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_all_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_RecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_noRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_UFOFRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b)); //gen match with underflow or overflow gen
+     h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_all_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_RecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_noRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_UFOFRecMatch_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b));
+     h_pt_Z_gen.push_back(new TH1D("pt_Z_gen_all_" + name, "", nBins_pt_Z_gen, xBins_pt_Z_gen));
+     h_pt_Z_gen.push_back(new TH1D("pt_Z_gen_RecMatch_" + name, "", nBins_pt_Z_gen, xBins_pt_Z_gen));
+     h_pt_Z_gen.push_back(new TH1D("pt_Z_gen_noRecMatch_" + name, "", nBins_pt_Z_gen, xBins_pt_Z_gen));
+     h_pt_Z_gen.push_back(new TH1D("pt_Z_gen_UFOFRecMatch_" + name, "", nBins_pt_Z_gen, xBins_pt_Z_gen));
      
-     h_pt_res_b1 = new TH2D("pt_res_b1_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b, nBins_pt_rec_b, xBins_pt_rec_b);
-     h_pt_res_b2 = new TH2D("pt_res_b2_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b, nBins_pt_rec_b, xBins_pt_rec_b);
-     h_pt_res_Z = new TH2D("pt_res_Z_" + name, "", nBins_pt_gen_Z, xBins_pt_gen_Z, nBins_pt_rec_Z, xBins_pt_rec_Z);
+     h_pt_b1_res = new TH2D("pt_b1_res_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b, nBins_pt_rec_b, xBins_pt_rec_b);
+     h_pt_b2_res = new TH2D("pt_b2_res_" + name, "", nBins_pt_gen_b, xBins_pt_gen_b, nBins_pt_rec_b, xBins_pt_rec_b);
+     h_pt_Z_res = new TH2D("pt_Z_res_" + name, "", nBins_pt_Z_gen, xBins_pt_Z_gen, nBins_pt_Z_rec, xBins_pt_Z_rec);
+*/
+     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_all_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_GenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_noGenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_UFOFGenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1])); //rec match with underflow or overflow gen
+     h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_all_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_GenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_noGenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_UFOFGenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_Z_rec.push_back(new TH1D("pt_Z_rec_all_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]));
+     h_pt_Z_rec.push_back(new TH1D("pt_Z_rec_GenMatch_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]));
+     h_pt_Z_rec.push_back(new TH1D("pt_Z_rec_noGenMatch_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]));
+     h_pt_Z_rec.push_back(new TH1D("pt_Z_rec_UFOFGenMatch_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]));
+     h_dR_2b_rec.push_back(new TH1D("dR_2b_rec_all_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
+     h_dR_2b_rec.push_back(new TH1D("dR_2b_rec_GenMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
+     h_dR_2b_rec.push_back(new TH1D("dR_2b_rec_noGenMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
+     h_dR_2b_rec.push_back(new TH1D("dR_2b_rec_UFOFGenMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
+     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_all_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_GenMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_noGenMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_UFOFGenMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dRmin_Z2b_rec.push_back(new TH1D("dRmin_Z2b_rec_all_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
+     h_dRmin_Z2b_rec.push_back(new TH1D("dRmin_Z2b_rec_GenMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
+     h_dRmin_Z2b_rec.push_back(new TH1D("dRmin_Z2b_rec_noGenMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
+     h_dRmin_Z2b_rec.push_back(new TH1D("dRmin_Z2b_rec_UFOFGenMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
+     h_A_Z2b_rec.push_back(new TH1D("A_Z2b_rec_all_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]));
+     h_A_Z2b_rec.push_back(new TH1D("A_Z2b_rec_GenMatch_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]));
+     h_A_Z2b_rec.push_back(new TH1D("A_Z2b_rec_noGenMatch_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]));
+     h_A_Z2b_rec.push_back(new TH1D("A_Z2b_rec_UFOFGenMatch_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]));
+     h_m_2b_rec.push_back(new TH1D("m_2b_rec_all_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1]));
+     h_m_2b_rec.push_back(new TH1D("m_2b_rec_GenMatch_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1]));
+     h_m_2b_rec.push_back(new TH1D("m_2b_rec_noGenMatch_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1]));
+     h_m_2b_rec.push_back(new TH1D("m_2b_rec_UFOFGenMatch_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1]));
+     h_m_Z2b_rec.push_back(new TH1D("m_Z2b_rec_all_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
+     h_m_Z2b_rec.push_back(new TH1D("m_Z2b_rec_GenMatch_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
+     h_m_Z2b_rec.push_back(new TH1D("m_Z2b_rec_noGenMatch_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
+     h_m_Z2b_rec.push_back(new TH1D("m_Z2b_rec_UFOFGenMatch_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
 
-     for(auto h : h_pt_gen_b1) h->Sumw2();
-     for(auto h : h_pt_gen_b2) h->Sumw2();
-     for(auto h : h_pt_gen_Z) h->Sumw2();
-     for(auto h : h_pt_rec_b1) h->Sumw2();
-     for(auto h : h_pt_rec_b2) h->Sumw2();
-     for(auto h : h_pt_rec_Z) h->Sumw2();
-     h_pt_res_b1->Sumw2();
-     h_pt_res_b2->Sumw2();
-     h_pt_res_Z->Sumw2();
+     h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_all_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_RecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_noRecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_UFOFRecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1])); //gen match with underflow or overflow gen
+     h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_all_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_RecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_noRecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_UFOFRecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
+     h_pt_Z_gen.push_back(new TH1D("pt_Z_gen_all_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]));
+     h_pt_Z_gen.push_back(new TH1D("pt_Z_gen_RecMatch_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]));
+     h_pt_Z_gen.push_back(new TH1D("pt_Z_gen_noRecMatch_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]));
+     h_pt_Z_gen.push_back(new TH1D("pt_Z_gen_UFOFRecMatch_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]));
+     h_dR_2b_gen.push_back(new TH1D("dR_2b_gen_all_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
+     h_dR_2b_gen.push_back(new TH1D("dR_2b_gen_RecMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
+     h_dR_2b_gen.push_back(new TH1D("dR_2b_gen_noRecMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
+     h_dR_2b_gen.push_back(new TH1D("dR_2b_gen_UFOFRecMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
+     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_all_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_RecMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_noRecMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_UFOFRecMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dRmin_Z2b_gen.push_back(new TH1D("dRmin_Z2b_gen_all_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
+     h_dRmin_Z2b_gen.push_back(new TH1D("dRmin_Z2b_gen_RecMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
+     h_dRmin_Z2b_gen.push_back(new TH1D("dRmin_Z2b_gen_noRecMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
+     h_dRmin_Z2b_gen.push_back(new TH1D("dRmin_Z2b_gen_UFOFRecMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
+     h_A_Z2b_gen.push_back(new TH1D("A_Z2b_gen_all_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]));
+     h_A_Z2b_gen.push_back(new TH1D("A_Z2b_gen_RecMatch_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]));
+     h_A_Z2b_gen.push_back(new TH1D("A_Z2b_gen_noRecMatch_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]));
+     h_A_Z2b_gen.push_back(new TH1D("A_Z2b_gen_UFOFRecMatch_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]));
+     h_m_2b_gen.push_back(new TH1D("m_2b_gen_all_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1]));
+     h_m_2b_gen.push_back(new TH1D("m_2b_gen_RecMatch_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1]));
+     h_m_2b_gen.push_back(new TH1D("m_2b_gen_noRecMatch_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1]));
+     h_m_2b_gen.push_back(new TH1D("m_2b_gen_UFOFRecMatch_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1]));
+     h_m_Z2b_gen.push_back(new TH1D("m_Z2b_gen_all_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
+     h_m_Z2b_gen.push_back(new TH1D("m_Z2b_gen_RecMatch_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
+     h_m_Z2b_gen.push_back(new TH1D("m_Z2b_gen_noRecMatch_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
+     h_m_Z2b_gen.push_back(new TH1D("m_Z2b_gen_UFOFRecMatch_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
+
+     h_pt_b1_res = new TH2D("pt_b1_res_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1],nBin_pt_b,x_pt_b[0],x_pt_b[1]);
+     h_pt_b2_res = new TH2D("pt_b2_res_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1],nBin_pt_b,x_pt_b[0],x_pt_b[1]);
+     h_pt_Z_res = new TH2D("pt_Z_res_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1], nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]);
+     h_dR_2b_res = new TH2D("dR_2b_res_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1], nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]);
+     h_dPhi_2b_res = new TH2D("dPhi_2b_res_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1], nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]);
+     h_dRmin_Z2b_res = new TH2D("dRmin_Z2b_res_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1], nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]);
+     h_A_Z2b_res = new TH2D("A_Z2b_res_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1], nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]);
+     h_m_2b_res = new TH2D("m_2b_res_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1], nBin_m_2b,x_m_2b[0],x_m_2b[1]);
+     h_m_Z2b_res = new TH2D("m_Z2b_res_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1], nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]);
+
+
+     for(auto h : h_pt_b1_rec) h->Sumw2();
+     for(auto h : h_pt_b2_rec) h->Sumw2();
+     for(auto h : h_pt_Z_rec) h->Sumw2();
+     for(auto h : h_dR_2b_rec) h->Sumw2();
+     for(auto h : h_dPhi_2b_rec) h->Sumw2();
+     for(auto h : h_dRmin_Z2b_rec) h->Sumw2();
+     for(auto h : h_A_Z2b_rec) h->Sumw2();
+     for(auto h : h_m_2b_rec) h->Sumw2();
+     for(auto h : h_m_Z2b_rec) h->Sumw2();
+     
+     for(auto h : h_pt_b1_gen) h->Sumw2();
+     for(auto h : h_pt_b2_gen) h->Sumw2();
+     for(auto h : h_pt_Z_gen) h->Sumw2();
+     for(auto h : h_dR_2b_gen) h->Sumw2();
+     for(auto h : h_dPhi_2b_gen) h->Sumw2();
+     for(auto h : h_dRmin_Z2b_gen) h->Sumw2();
+     for(auto h : h_A_Z2b_gen) h->Sumw2();
+     for(auto h : h_m_2b_gen) h->Sumw2();
+     for(auto h : h_m_Z2b_gen) h->Sumw2();
+     
+     h_pt_b1_res->Sumw2();
+     h_pt_b2_res->Sumw2();
+     h_pt_Z_res->Sumw2();
+     h_dR_2b_res->Sumw2();
+     h_dPhi_2b_res->Sumw2();
+     h_dRmin_Z2b_res->Sumw2();
+     h_A_Z2b_res->Sumw2();
+     h_m_2b_res->Sumw2();
+     h_m_Z2b_res->Sumw2();
 
     }
     
     void Fill(TString type, TLorentzVector l1, TLorentzVector l2, TLorentzVector b1, TLorentzVector b2, float w) {
+      int iRec = -1;
+      int iGen = -1;
+      if (type == "REC_ALL") iRec=0;
+      if (type == "REC_GENMATCH") iRec=1; 
+      if (type == "REC_NOGENMATCH") iRec=2;
+      if (type == "GEN_ALL") iGen=0;
+      if (type == "GEN_RECMATCH") iGen=1;
+      if (type == "GEN_NORECMATCH") iGen=2;
+
       TLorentzVector Z = l1 + l2 ;
-      if (type == "REC_ALL") {
-        h_pt_rec_b1[0]->Fill(b1.Pt(),w);
-        h_pt_rec_b2[0]->Fill(b2.Pt(),w);
-        h_pt_rec_Z[0]->Fill(Z.Pt(),w);
+      float dR = Z.DeltaR(b1) ;
+      float dR1 = Z.DeltaR(b2) ;
+      float dRmin = (dR <= dR1) ? dR : dR1 ;
+      float dRmax = (dR > dR1) ? dR : dR1 ;
+      float A_Z2b = (dRmax - dRmin)/(dRmax + dRmin) ;
+      float m2b = (b1+b2).M();
+      float mZ2b = (Z+b1+b2).M();
+      if (iRec != -1){
+        h_pt_b1_rec[iRec]->Fill(b1.Pt(),w);
+        h_pt_b2_rec[iRec]->Fill(b2.Pt(),w);
+        h_pt_Z_rec[iRec]->Fill(Z.Pt(),w);
+        h_dR_2b_rec[iRec]->Fill(b1.DeltaR(b2),w);
+        h_dPhi_2b_rec[iRec]->Fill(fabs(b1.DeltaPhi(b2)),w);
+        h_dRmin_Z2b_rec[iRec]->Fill(dRmin,w);
+        h_A_Z2b_rec[iRec]->Fill(A_Z2b,w);
+        h_m_2b_rec[iRec]->Fill(m2b,w);
+        h_m_Z2b_rec[iRec]->Fill(mZ2b,w);
       }
-      if (type == "REC_GENMATCH") {
-        h_pt_rec_b1[1]->Fill(b1.Pt(),w);
-        h_pt_rec_b2[1]->Fill(b2.Pt(),w);
-        h_pt_rec_Z[1]->Fill(Z.Pt(),w);
+      if (iGen!=-1){
+        h_pt_b1_gen[iGen]->Fill(b1.Pt(),w) ;
+        h_pt_b2_gen[iGen]->Fill(b2.Pt(),w) ;
+        h_pt_Z_gen[iGen]->Fill(Z.Pt(),w) ;
+        h_dR_2b_gen[iGen]->Fill(b1.DeltaR(b2),w);
+        h_dPhi_2b_gen[iGen]->Fill(fabs(b1.DeltaPhi(b2)),w);
+        h_dRmin_Z2b_gen[iGen]->Fill(dRmin,w);
+        h_A_Z2b_gen[iGen]->Fill(A_Z2b,w);
+        h_m_2b_gen[iGen]->Fill(m2b,w);
+        h_m_Z2b_gen[iGen]->Fill(mZ2b,w);
       }
-      if (type == "REC_NOGENMATCH") {
-        h_pt_rec_b1[2]->Fill(b1.Pt(),w);
-        h_pt_rec_b2[2]->Fill(b2.Pt(),w);
-        h_pt_rec_Z[2]->Fill(Z.Pt(),w);
-      }
-      if (type == "GEN_ALL") {
-        h_pt_gen_b1[0]->Fill(b1.Pt(),w) ;
-        h_pt_gen_b2[0]->Fill(b2.Pt(),w) ;
-        h_pt_gen_Z[0]->Fill(Z.Pt(),w) ;
-      }
-      if (type == "GEN_RECMATCH") {
-        h_pt_gen_b1[1]->Fill(b1.Pt(),w) ;
-        h_pt_gen_b2[1]->Fill(b2.Pt(),w) ;
-        h_pt_gen_Z[1]->Fill(Z.Pt(),w) ;
-      }
-      if (type == "GEN_NORECMATCH") {
-        h_pt_gen_b1[2]->Fill(b1.Pt(),w) ;
-        h_pt_gen_b2[2]->Fill(b2.Pt(),w) ;
-        h_pt_gen_Z[2]->Fill(Z.Pt(),w) ;
-      }
+
     }
     
     void FillUFOF(double y_rec, double x_gen, TH2D* hRes, TH1D* hRec, TH1D* hGen, float w_all, float gen_w) {
@@ -454,42 +602,113 @@ class UnfoldingPlots
     void FillRes(TLorentzVector rec_l1, TLorentzVector rec_l2, TLorentzVector rec_b1, TLorentzVector rec_b2, TLorentzVector gen_l1, TLorentzVector gen_l2, TLorentzVector gen_b1, TLorentzVector gen_b2, float w_all, float gen_w) {
       TLorentzVector rec_Z = rec_l1 + rec_l2;
       TLorentzVector gen_Z = gen_l1 + gen_l2;
-      FillUFOF(rec_b1.Pt(),gen_b1.Pt(),h_pt_res_b1,h_pt_rec_b1[3],h_pt_gen_b1[3],w_all,gen_w); 
-      FillUFOF(rec_b2.Pt(),gen_b2.Pt(),h_pt_res_b2,h_pt_rec_b2[3],h_pt_gen_b2[3],w_all,gen_w); 
-      FillUFOF(rec_Z.Pt(),gen_Z.Pt(),h_pt_res_Z,h_pt_rec_Z[3],h_pt_gen_Z[3],w_all,gen_w); 
-      h_pt_res_b1->Fill(gen_b1.Pt(),rec_b1.Pt(),gen_w);
-      h_pt_res_b2->Fill(gen_b2.Pt(),rec_b2.Pt(),gen_w);
-      h_pt_res_Z->Fill(gen_Z.Pt(),rec_Z.Pt(),gen_w);
+      float rec_dR_2b = rec_b1.DeltaR(rec_b2);
+      float rec_dPhi_2b = fabs(rec_b1.DeltaPhi(rec_b2));
+      float rec_dR = rec_Z.DeltaR(rec_b1) ;
+      float rec_dR1 = rec_Z.DeltaR(rec_b2) ;
+      float rec_dRmin_Z2b = (rec_dR <= rec_dR1) ? rec_dR : rec_dR1 ;
+      float rec_dRmax = (rec_dR > rec_dR1) ? rec_dR : rec_dR1 ;
+      float rec_A_Z2b = (rec_dRmax - rec_dRmin_Z2b)/(rec_dRmax + rec_dRmin_Z2b) ;
+      float rec_m_2b = (rec_b1+rec_b2).M();
+      float rec_m_Z2b = (rec_Z+rec_b1+rec_b2).M();
+      
+      float gen_dR_2b = gen_b1.DeltaR(gen_b2);
+      float gen_dPhi_2b = fabs(gen_b1.DeltaPhi(gen_b2));
+      float gen_dR = gen_Z.DeltaR(gen_b1) ;
+      float gen_dR1 = gen_Z.DeltaR(gen_b2) ;
+      float gen_dRmin_Z2b = (gen_dR <= gen_dR1) ? gen_dR : gen_dR1 ;
+      float gen_dRmax = (gen_dR > gen_dR1) ? gen_dR : gen_dR1 ;
+      float gen_A_Z2b = (gen_dRmax - gen_dRmin_Z2b)/(gen_dRmax + gen_dRmin_Z2b) ;
+      float gen_m_2b = (gen_b1+gen_b2).M();
+      float gen_m_Z2b = (gen_Z+gen_b1+gen_b2).M();
+
+      FillUFOF(rec_b1.Pt(),gen_b1.Pt(),h_pt_b1_res,h_pt_b1_rec[3],h_pt_b1_gen[3],w_all,gen_w); 
+      FillUFOF(rec_b2.Pt(),gen_b2.Pt(),h_pt_b2_res,h_pt_b2_rec[3],h_pt_b2_gen[3],w_all,gen_w); 
+      FillUFOF(rec_Z.Pt(),gen_Z.Pt(),h_pt_Z_res,h_pt_Z_rec[3],h_pt_Z_gen[3],w_all,gen_w); 
+      FillUFOF(rec_dR_2b,gen_dR_2b,h_dR_2b_res,h_dR_2b_rec[3],h_dR_2b_gen[3],w_all,gen_w); 
+      FillUFOF(rec_dPhi_2b,gen_dPhi_2b,h_dPhi_2b_res,h_dPhi_2b_rec[3],h_dPhi_2b_gen[3],w_all,gen_w); 
+      FillUFOF(rec_dRmin_Z2b,gen_dRmin_Z2b,h_dRmin_Z2b_res,h_dRmin_Z2b_rec[3],h_dRmin_Z2b_gen[3],w_all,gen_w); 
+      FillUFOF(rec_A_Z2b,gen_A_Z2b,h_A_Z2b_res,h_A_Z2b_rec[3],h_A_Z2b_gen[3],w_all,gen_w); 
+      FillUFOF(rec_m_2b,gen_m_2b,h_m_2b_res,h_m_2b_rec[3],h_m_2b_gen[3],w_all,gen_w); 
+      FillUFOF(rec_m_Z2b,gen_m_Z2b,h_m_Z2b_res,h_m_Z2b_rec[3],h_m_Z2b_gen[3],w_all,gen_w); 
+      
+      h_pt_b1_res->Fill(gen_b1.Pt(),rec_b1.Pt(),gen_w);
+      h_pt_b2_res->Fill(gen_b2.Pt(),rec_b2.Pt(),gen_w);
+      h_pt_Z_res->Fill(gen_Z.Pt(),rec_Z.Pt(),gen_w);
+      h_dR_2b_res->Fill(gen_dR_2b,rec_dR_2b,gen_w);
+      h_dPhi_2b_res->Fill(gen_dPhi_2b,rec_dPhi_2b,gen_w);
+      h_dRmin_Z2b_res->Fill(gen_dRmin_Z2b,rec_dRmin_Z2b,gen_w);
+      h_A_Z2b_res->Fill(gen_A_Z2b,rec_A_Z2b,gen_w);
+      h_m_2b_res->Fill(gen_m_2b,rec_m_2b,gen_w);
+      h_m_Z2b_res->Fill(gen_m_Z2b,rec_m_Z2b,gen_w);
     }
 
     std::vector<TH1*> returnHisto() {
       std::vector<TH1*> histolist;
-      for (unsigned i = 0 ; i < h_pt_rec_b1.size() ; ++i) histolist.push_back(h_pt_rec_b1[i]);
-      for (unsigned i = 0 ; i < h_pt_rec_b2.size() ; ++i) histolist.push_back(h_pt_rec_b2[i]);
-      for (unsigned i = 0 ; i < h_pt_rec_Z.size() ; ++i) histolist.push_back(h_pt_rec_Z[i]);
-      for (unsigned i = 0 ; i < h_pt_gen_b1.size() ; ++i) histolist.push_back(h_pt_gen_b1[i]);
-      for (unsigned i = 0 ; i < h_pt_gen_b2.size() ; ++i) histolist.push_back(h_pt_gen_b2[i]);
-      for (unsigned i = 0 ; i < h_pt_gen_Z.size() ; ++i) histolist.push_back(h_pt_gen_Z[i]);
-      histolist.push_back(h_pt_res_b1);
-      histolist.push_back(h_pt_res_b2);
-      histolist.push_back(h_pt_res_Z);
+      for (unsigned i = 0 ; i < h_pt_b1_rec.size() ; ++i) histolist.push_back(h_pt_b1_rec[i]);
+      for (unsigned i = 0 ; i < h_pt_b2_rec.size() ; ++i) histolist.push_back(h_pt_b2_rec[i]);
+      for (unsigned i = 0 ; i < h_pt_Z_rec.size() ; ++i) histolist.push_back(h_pt_Z_rec[i]);
+      for (unsigned i = 0 ; i < h_dR_2b_rec.size() ; ++i) histolist.push_back(h_dR_2b_rec[i]);
+      for (unsigned i = 0 ; i < h_dPhi_2b_rec.size() ; ++i) histolist.push_back(h_dPhi_2b_rec[i]);
+      for (unsigned i = 0 ; i < h_dRmin_Z2b_rec.size() ; ++i) histolist.push_back(h_dRmin_Z2b_rec[i]);
+      for (unsigned i = 0 ; i < h_A_Z2b_rec.size() ; ++i) histolist.push_back(h_A_Z2b_rec[i]);
+      for (unsigned i = 0 ; i < h_m_2b_rec.size() ; ++i) histolist.push_back(h_m_2b_rec[i]);
+      for (unsigned i = 0 ; i < h_m_Z2b_rec.size() ; ++i) histolist.push_back(h_m_Z2b_rec[i]);
+      
+      for (unsigned i = 0 ; i < h_pt_b1_gen.size() ; ++i) histolist.push_back(h_pt_b1_gen[i]);
+      for (unsigned i = 0 ; i < h_pt_b2_gen.size() ; ++i) histolist.push_back(h_pt_b2_gen[i]);
+      for (unsigned i = 0 ; i < h_pt_Z_gen.size() ; ++i) histolist.push_back(h_pt_Z_gen[i]);
+      for (unsigned i = 0 ; i < h_dR_2b_gen.size() ; ++i) histolist.push_back(h_dR_2b_gen[i]);
+      for (unsigned i = 0 ; i < h_dPhi_2b_gen.size() ; ++i) histolist.push_back(h_dPhi_2b_gen[i]);
+      for (unsigned i = 0 ; i < h_dRmin_Z2b_gen.size() ; ++i) histolist.push_back(h_dRmin_Z2b_gen[i]);
+      for (unsigned i = 0 ; i < h_A_Z2b_gen.size() ; ++i) histolist.push_back(h_A_Z2b_gen[i]);
+      for (unsigned i = 0 ; i < h_m_2b_gen.size() ; ++i) histolist.push_back(h_m_2b_gen[i]);
+      for (unsigned i = 0 ; i < h_m_Z2b_gen.size() ; ++i) histolist.push_back(h_m_Z2b_gen[i]);
+
+      histolist.push_back(h_pt_b1_res);
+      histolist.push_back(h_pt_b2_res);
+      histolist.push_back(h_pt_Z_res);
+      histolist.push_back(h_dR_2b_res);
+      histolist.push_back(h_dPhi_2b_res);
+      histolist.push_back(h_dRmin_Z2b_res);
+      histolist.push_back(h_A_Z2b_res);
+      histolist.push_back(h_m_2b_res);
+      histolist.push_back(h_m_Z2b_res);
       return histolist;
     }
 
   private:
     TString m_name;
     //plots for background (x-axis = rec)
-    std::vector<TH1D*> h_pt_rec_b1; //0: all rec, 1: rec not have matched gen
-    std::vector<TH1D*> h_pt_rec_b2;
-    std::vector<TH1D*> h_pt_rec_Z;
+    std::vector<TH1D*> h_pt_b1_rec; //0: all rec, 1: rec not have matched gen
+    std::vector<TH1D*> h_pt_b2_rec;
+    std::vector<TH1D*> h_pt_Z_rec;
+    std::vector<TH1D*> h_dR_2b_rec;
+    std::vector<TH1D*> h_dPhi_2b_rec;
+    std::vector<TH1D*> h_dRmin_Z2b_rec;
+    std::vector<TH1D*> h_A_Z2b_rec;
+    std::vector<TH1D*> h_m_2b_rec;
+    std::vector<TH1D*> h_m_Z2b_rec;
     //plots for eff (x-axis = gen)
-    std::vector<TH1D*> h_pt_gen_b1; //0: all gen, 1: gen not have matched reco
-    std::vector<TH1D*> h_pt_gen_b2;
-    std::vector<TH1D*> h_pt_gen_Z;
+    std::vector<TH1D*> h_pt_b1_gen; //0: all gen, 1: gen not have matched reco
+    std::vector<TH1D*> h_pt_b2_gen;
+    std::vector<TH1D*> h_pt_Z_gen;
+    std::vector<TH1D*> h_dR_2b_gen;
+    std::vector<TH1D*> h_dPhi_2b_gen;
+    std::vector<TH1D*> h_dRmin_Z2b_gen;
+    std::vector<TH1D*> h_A_Z2b_gen;
+    std::vector<TH1D*> h_m_2b_gen;
+    std::vector<TH1D*> h_m_Z2b_gen;
     //plots for response matrix
-    TH2D* h_pt_res_b1;
-    TH2D* h_pt_res_b2;
-    TH2D* h_pt_res_Z;
+    TH2D* h_pt_b1_res;
+    TH2D* h_pt_b2_res;
+    TH2D* h_pt_Z_res;
+    TH2D* h_dR_2b_res;
+    TH2D* h_dPhi_2b_res;
+    TH2D* h_dRmin_Z2b_res;
+    TH2D* h_A_Z2b_res;
+    TH2D* h_m_2b_res;
+    TH2D* h_m_Z2b_res;
 } ;
 
 

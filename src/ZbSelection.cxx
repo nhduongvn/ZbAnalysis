@@ -30,6 +30,7 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_evt = new TH1D("Nevt","",3,-1.5,1.5) ;
   h_zee_jet = new ZbPlots("Zee_jet") ;
   h_zee_bjet = new ZbPlots("Zee_bjet") ;
+  h_zee_bjet_afterMET = new ZbPlots("Zee_bjet_afterMET") ;
   h_zee_2bjet = new Z2bPlots("Zee_2bjet") ;
 
   h_zee_2bjet_bb = new Z2bPlots("Zee_2bjet_bb") ; //two tagged bjets are bb
@@ -40,6 +41,7 @@ void ZbSelection::SlaveBegin(Reader* r) {
   
   h_zmm_jet = new ZbPlots("Zmm_jet") ;
   h_zmm_bjet = new ZbPlots("Zmm_bjet") ;
+  h_zmm_bjet_afterMET = new ZbPlots("Zmm_bjet_afterMET") ;
   h_zmm_2bjet = new Z2bPlots("Zmm_2bjet") ;
   h_zmm_2bjet_bb = new Z2bPlots("Zmm_2bjet_bb") ; //two tagged bjets are bb
   h_zmm_2bjet_bX = new Z2bPlots("Zmm_2bjet_bX") ; //two tagged bjets are bb
@@ -106,7 +108,13 @@ void ZbSelection::SlaveBegin(Reader* r) {
   tmp = h_zee_bjet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
+  tmp = h_zee_bjet_afterMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
   tmp = h_zmm_bjet->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
+  tmp = h_zmm_bjet_afterMET->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
   tmp = h_zee_2bjet->returnHisto() ;
@@ -542,12 +550,18 @@ void ZbSelection::Process(Reader* r) {
         
         //at least one b-tagged jets
         h_zee_bjet->FillNjet(bjets.size(),evtW) ; 
+        if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zee_bjet_afterMET->FillNjet(bjets.size(),evtW);
+
         if (bjets.size() >=1) {
            
           h_zee_cutflow->Fill(6) ;
 
           h_zee_bjet->Fill(Z, bjets[0], zeeb_w) ;
           h_zee_bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+          if (*(r->MET_pt) < CUTS.Get<float>("MET")) {
+            h_zee_bjet_afterMET->Fill(Z, bjets[0], zeeb_w) ;
+            h_zee_bjet_afterMET->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+          }
         }
 
         //at least two b-tagged jets
@@ -676,12 +690,21 @@ void ZbSelection::Process(Reader* r) {
         
         //Zmm+bjets
         h_zmm_bjet->FillNjet(bjets.size(),zmmb_w) ; 
+
+        if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zmm_bjet_afterMET->FillNjet(bjets.size(),zmmb_w) ; 
+
         if (bjets.size() >= 1) {
           
           h_zmm_cutflow->Fill(6) ;
           
           h_zmm_bjet->Fill(Z, bjets[0], zmmb_w) ; 
           h_zmm_bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+          
+          if (*(r->MET_pt) < CUTS.Get<float>("MET")) {
+            h_zmm_bjet_afterMET->Fill(Z, bjets[0], zmmb_w) ; 
+            h_zmm_bjet_afterMET->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+          }
+
         }
       
         //Zmm+2bjets
@@ -897,6 +920,12 @@ void ZbSelection::FillUnfolding_1(std::vector<TLorentzVector> recs, std::vector<
         h->Fill("REC_GENMATCH",recs[0],recs[1],recs[2],recs[3],w_all);
         h->FillRes(recs[0],recs[1],recs[2],recs[3],gens[0],gens[1],gens[2],gens[3],w_all,w_gen);
       }
+      else {
+        h->Fill("REC_NOGENMATCH",recs[0],recs[1],recs[2],recs[3],w_all);
+      }
+    }
+    else {
+      h->Fill("REC_NOGENMATCH",recs[0],recs[1],recs[2],recs[3],w_all);
     }
   }
 
@@ -910,6 +939,12 @@ void ZbSelection::FillUnfolding_1(std::vector<TLorentzVector> recs, std::vector<
       if (dR1 < 0.2 && dR2 < 0.2 && dR3 < 0.2 && dR4 < 0.2) { //matching found fill efficiency 
         h->Fill("GEN_RECMATCH",gens[0],gens[1],gens[2],gens[3],w_all); //weights by w_all since match with reco
       }
+      else {
+        h->Fill("GEN_NORECMATCH",gens[0],gens[1],gens[2],gens[3],w_gen);
+      }
+    }
+    else {
+      h->Fill("GEN_NORECMATCH",gens[0],gens[1],gens[2],gens[3],w_gen);
     }
   }
 }
