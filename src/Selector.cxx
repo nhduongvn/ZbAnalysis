@@ -17,7 +17,7 @@ void Selector::SetLumiMaskFilter(std::string fName_lumiMaskFilter) {
   m_lumiFilter.Set(fName_lumiMaskFilter) ;
 }
 
-void Selector::SetBtagCalib(std::string csvFileName, std::string taggerName, std::string effFileName) {
+void Selector::SetBtagCalib(std::string csvFileName, std::string taggerName, std::string effFileName, std::string btagUncType) {
   m_btagCal = BTagCalibration(taggerName, csvFileName) ;
   m_btagReader = BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
                                        "central",            //central sys type
@@ -32,7 +32,7 @@ void Selector::SetBtagCalib(std::string csvFileName, std::string taggerName, std
   m_btagReader.load(m_btagCal, 
             BTagEntry::FLAV_UDSG,
             "incl") ;           
-  
+  m_btagUncType = btagUncType;
   m_btagEffFile = new TFile(effFileName.c_str(),"READ") ;
 
 }

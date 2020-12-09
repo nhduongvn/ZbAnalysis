@@ -30,7 +30,7 @@ class Selector
   virtual void SetRandom() ;
   virtual void SetDataInfo(bool isData, std::string year) {m_isData = isData ; m_year = year ; } ;
   
-  virtual void SetBtagCalib(std::string csvFileName, std::string taggerName, std::string effFileName) ;
+  virtual void SetBtagCalib(std::string csvFileName, std::string taggerName, std::string effFileName, std::string btagUncType) ;
   virtual void SetEleEffCorr(std::vector<std::string> fName_trig, std::string fName_recSF, std::string fName_IDSF, std::vector<float> w_trig) ;
   virtual void SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<std::string> fName_ID, std::vector<std::string> fName_iso, std::vector<float> w_trig, std::vector<float> w_ID, std::vector<float> w_iso) ;
   virtual void SetRochesterCorr(std::string fName_roc) ;
@@ -73,6 +73,8 @@ class Selector
   std::vector<float> m_muonTrig_w ;
   std::vector<float> m_muonIso_w ;
   std::vector<float> m_muonID_w ;
+
+  std::string m_btagUncType;
 
   TH1D* m_hSF_pu;
 

@@ -436,7 +436,8 @@ void ZbSelection::Process(Reader* r) {
   float btag_w(1.);
   if (!m_isData) {
     //note this is SF for medium DeepCSV
-    btag_w = CalBtagWeight(jets,CUTS.GetStr("jet_main_btagWP")) ;
+    btag_w = CalBtagWeight(jets,CUTS.GetStr("jet_main_btagWP"),m_btagUncType) ;
+    //std::cout << "\n Btag: " << btag_w;
     if (eles.size()>=2) eleSF_w = CalEleSF(eles[0],eles[1]) ;
     if (muons.size()>=2) muonSF_w = CalMuonSF_id_iso(muons[0],muons[1]);
   }
