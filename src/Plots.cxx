@@ -14,8 +14,8 @@ const unsigned NBIN_PT_Z = 300;
 const float X_PT_Z[2] = {0,300};
 const unsigned NBIN_DR_2B = 100;
 const float X_DR_2B[2] = {0,10};
-const unsigned NBIN_DPHI_2B = 60;
-const float X_DPHI_2B[2] = {0,TMath::Pi()};
+//const unsigned NBIN_DPHI_2B = 60;
+//const float X_DPHI_2B[2] = {0,TMath::Pi()};
 const unsigned NBIN_DRMIN_Z2B = 100;
 const float X_DRMIN_Z2B[2] = {0,10};
 const unsigned NBIN_A_Z2B = 100;
@@ -24,6 +24,11 @@ const unsigned NBIN_M_2B = 500;
 const float X_M_2B[2] = {0,500};
 const unsigned NBIN_M_Z2B = 600;
 const float X_M_Z2B[2] = {0,600};
+
+const unsigned NBIN_DPHI_2B(31);
+const float X_DPHI_2B[NBIN_DPHI_2B+1] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,
+                                           1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,
+                                           2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,TMath::Pi()};
 
 class ZbPlots 
 {
@@ -234,7 +239,7 @@ class Z2bPlots : public ZbPlots{
       h_m_2b = new TH1D(name + "_m_2b","",NBIN_M_2B,X_M_2B[0],X_M_2B[1]) ;
       h_m_Z2b = new TH1D(name + "_m_Z2b","",NBIN_M_Z2B,X_M_Z2B[0],X_M_Z2B[1]) ;
       h_dR_2b = new TH1D(name + "_dR_2b","",NBIN_DR_2B,X_DR_2B[0],X_DR_2B[1]) ;
-      h_dPhi_2b = new TH1D(name + "_dPhi_2b","",NBIN_DPHI_2B,X_DPHI_2B[0],X_DPHI_2B[1]) ;
+      h_dPhi_2b = new TH1D(name + "_dPhi_2b","",NBIN_DPHI_2B,X_DPHI_2B) ;
       h_dR_Zb = new TH1D(name + "_dR_Zb","",100,0,10) ;
       h_dPhi_Zb = new TH1D(name + "_dPhi_Zb","",60,0,TMath::Pi()) ;
       h_dR_Zb1 = new TH1D(name + "_dR_Zb1","",100,0,10) ;
@@ -371,15 +376,14 @@ class UnfoldingPlots
      float xBins_pt_Z_rec[nBins_pt_Z_rec] = {0,20,30,40,50,60,70,90,120,150,200};
      unsigned nBins_pt_Z_gen(6);
      float xBins_pt_Z_gen[nBins_pt_Z_gen] = {0,30,50,70,90,150,200};
-
      unsigned nBin_pt_b(170);
      float x_pt_b[2]={30,200};
      unsigned nBin_pt_Z(200);
      float x_pt_Z[2]={0,200};
      unsigned nBin_dR_2b(46);
      float x_dR_2b[2]={0.4,5};
-     unsigned nBin_dPhi_2b(60);
-     float x_dPhi_2b[2]={0,TMath::Pi()};
+     //unsigned nBin_dPhi_2b(60);
+     //float x_dPhi_2b[2]={0,TMath::Pi()};
      unsigned nBin_dRmin_Z2b(50);
      float x_dRmin_Z2b[2]={0,5};
      unsigned nBin_A_Z2b = 100;
@@ -441,10 +445,10 @@ class UnfoldingPlots
      h_dR_2b_rec.push_back(new TH1D("dR_2b_rec_GenMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
      h_dR_2b_rec.push_back(new TH1D("dR_2b_rec_noGenMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
      h_dR_2b_rec.push_back(new TH1D("dR_2b_rec_UFOFGenMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
-     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_all_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
-     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_GenMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
-     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_noGenMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
-     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_UFOFGenMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_all_" + name, "", NBIN_DPHI_2B,X_DPHI_2B));
+     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_GenMatch_" + name, "", NBIN_DPHI_2B,X_DPHI_2B));
+     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_noGenMatch_" + name, "", NBIN_DPHI_2B,X_DPHI_2B));
+     h_dPhi_2b_rec.push_back(new TH1D("dPhi_2b_rec_UFOFGenMatch_" + name, "", NBIN_DPHI_2B,X_DPHI_2B));
      h_dRmin_Z2b_rec.push_back(new TH1D("dRmin_Z2b_rec_all_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
      h_dRmin_Z2b_rec.push_back(new TH1D("dRmin_Z2b_rec_GenMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
      h_dRmin_Z2b_rec.push_back(new TH1D("dRmin_Z2b_rec_noGenMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
@@ -478,10 +482,10 @@ class UnfoldingPlots
      h_dR_2b_gen.push_back(new TH1D("dR_2b_gen_RecMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
      h_dR_2b_gen.push_back(new TH1D("dR_2b_gen_noRecMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
      h_dR_2b_gen.push_back(new TH1D("dR_2b_gen_UFOFRecMatch_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]));
-     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_all_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
-     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_RecMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
-     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_noRecMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
-     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_UFOFRecMatch_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]));
+     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_all_" + name, "", NBIN_DPHI_2B,X_DPHI_2B));
+     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_RecMatch_" + name, "", NBIN_DPHI_2B,X_DPHI_2B));
+     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_noRecMatch_" + name, "", NBIN_DPHI_2B,X_DPHI_2B));
+     h_dPhi_2b_gen.push_back(new TH1D("dPhi_2b_gen_UFOFRecMatch_" + name, "", NBIN_DPHI_2B,X_DPHI_2B));
      h_dRmin_Z2b_gen.push_back(new TH1D("dRmin_Z2b_gen_all_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
      h_dRmin_Z2b_gen.push_back(new TH1D("dRmin_Z2b_gen_RecMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
      h_dRmin_Z2b_gen.push_back(new TH1D("dRmin_Z2b_gen_noRecMatch_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]));
@@ -503,7 +507,7 @@ class UnfoldingPlots
      h_pt_b2_res = new TH2D("pt_b2_res_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1],nBin_pt_b,x_pt_b[0],x_pt_b[1]);
      h_pt_Z_res = new TH2D("pt_Z_res_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1], nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]);
      h_dR_2b_res = new TH2D("dR_2b_res_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1], nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]);
-     h_dPhi_2b_res = new TH2D("dPhi_2b_res_" + name, "", nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1], nBin_dPhi_2b,x_dPhi_2b[0],x_dPhi_2b[1]);
+     h_dPhi_2b_res = new TH2D("dPhi_2b_res_" + name, "", NBIN_DPHI_2B,X_DPHI_2B, NBIN_DPHI_2B,X_DPHI_2B);
      h_dRmin_Z2b_res = new TH2D("dRmin_Z2b_res_" + name, "", nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1], nBin_dRmin_Z2b,x_dRmin_Z2b[0],x_dRmin_Z2b[1]);
      h_A_Z2b_res = new TH2D("A_Z2b_res_" + name, "", nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1], nBin_A_Z2b,x_A_Z2b[0],x_A_Z2b[1]);
      h_m_2b_res = new TH2D("m_2b_res_" + name, "", nBin_m_2b,x_m_2b[0],x_m_2b[1], nBin_m_2b,x_m_2b[0],x_m_2b[1]);

@@ -416,7 +416,7 @@ void ZbSelection::Process(Reader* r) {
     if (jet.IsLepton(muons_jetOverlap)) continue ;
     h_Jet_cutflow->Fill(4) ;
     
-    if (r->Jet_jetId[i] <= 0 ) continue ;
+    if (r->Jet_jetId[i] < 2 ) continue ;
     h_Jet_cutflow->Fill(5) ;
     
     //FIXME: turn this on for v7
