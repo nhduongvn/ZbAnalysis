@@ -417,6 +417,8 @@ void ZbSelection::Process(Reader* r) {
     h_Jet_cutflow->Fill(4) ;
     
     if (r->Jet_jetId[i] < 2 ) continue ;
+    //FIXME test jet id
+    //if (r->Jet_jetId[i] <= 0 ) continue ;
     h_Jet_cutflow->Fill(5) ;
     
     //FIXME: turn this on for v7
@@ -438,8 +440,11 @@ void ZbSelection::Process(Reader* r) {
     //note this is SF for medium DeepCSV
     btag_w = CalBtagWeight(jets,CUTS.GetStr("jet_main_btagWP"),m_btagUncType) ;
     //std::cout << "\n Btag: " << btag_w;
-    if (eles.size()>=2) eleSF_w = CalEleSF(eles[0],eles[1]) ;
-    if (muons.size()>=2) muonSF_w = CalMuonSF_id_iso(muons[0],muons[1]);
+    if (eles.size()>=2) eleSF_w = CalEleSF(eles[0],eles[1]) ; //unc already set and calculated in Selector.cxx
+    if (muons.size()>=2) {
+      muonSF_w = CalMuonSF_id_iso(muons[0],muons[1]);
+      //std::cout << "\n Muon SF, " << m_muonUncType << " " << muonSF_w;
+    }
   }
 
   //if (bjets.size()>=1) std::cout << "\n btagWeight: " << btagWeight ;
@@ -489,13 +494,13 @@ void ZbSelection::Process(Reader* r) {
   TLorentzVector trigObj_ele = GetTrigObj(r, 11, ele_bits, ptThr_ele) ;
   TLorentzVector trigObj_muon = GetTrigObj(r, 13, muon_bits, ptThr_muon) ;
 
-  float trigSF_ele(1) ;
+  float trigSF_ele(1.0) ;
   if (!m_isData && (eles.size() >= 2)) {
     trigSF_ele =  CalTrigSF(11,eles[0], eles[1], trigObj_ele, h_dR1_eleTrig, h_dR2_eleTrig, h_pt1_eleTrig, h_pt2_eleTrig) ;
   }
   
   float trigSF_muon(1) ;
-  if (!m_isData && (muons.size() >= 2)) trigSF_muon =  CalTrigSF(13,muons[0], muons[1], trigObj_muon, h_dR1_muonTrig, h_dR2_muonTrig, h_pt1_muonTrig, h_pt2_muonTrig) ;
+  if (!m_isData && (muons.size() >= 2)) trigSF_muon =  CalTrigSF(13,muons[0], muons[1], trigObj_muon, h_dR1_muonTrig, h_dR2_muonTrig, h_pt1_muonTrig, h_pt2_muonTrig) ; //uncertainties already calculate inside CalTrigSF
 
   //TEMP
   //eleTrig = true ;

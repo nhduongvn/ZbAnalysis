@@ -37,7 +37,7 @@ void Selector::SetBtagCalib(std::string csvFileName, std::string taggerName, std
 
 }
 
-void Selector::SetEleEffCorr(std::vector<std::string> fName_trig,std::string fName_recSF, std::string fName_IDSF, std::vector<float> w_trig) {
+void Selector::SetEleEffCorr(std::vector<std::string> fName_trig,std::string fName_recSF, std::string fName_IDSF, std::vector<float> w_trig, std::string eleUncType) {
   std::string trigN("EGamma_SF2D");
   TFile* fRec = new TFile(fName_recSF.c_str(),"READ") ;
   TFile* fID = new TFile(fName_IDSF.c_str(),"READ") ;
@@ -50,23 +50,30 @@ void Selector::SetEleEffCorr(std::vector<std::string> fName_trig,std::string fNa
   }
 
   for(float w : w_trig) m_eleTrig_w.push_back(w) ;
+  m_eleUncType = eleUncType;
 }
 
 //multiple inputs to deal with different SFs for different run periods 
-void Selector::SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<std::string> fName_ID, std::vector<std::string> fName_iso, std::vector<float> w_trig, std::vector<float> w_ID, std::vector<float> w_iso) {
+void Selector::SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<std::string> fName_ID, std::vector<std::string> fName_iso, std::vector<float> w_trig, std::vector<float> w_ID, std::vector<float> w_iso, std::string muonUncType) {
   std::string trigN("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
-  std::string idN("NUM_MediumID_DEN_genTracks_eta_pt_syst");
-  std::string isoN("NUM_TightRelIso_DEN_MediumID_eta_pt_syst");//FIXME tight iso?
+  //std::string idN("NUM_MediumID_DEN_genTracks_eta_pt_syst");
+  //std::string isoN("NUM_TightRelIso_DEN_MediumID_eta_pt_syst");//FIXME tight iso?
+  std::string idN("NUM_MediumID_DEN_genTracks_eta_pt");//use this to get total unc = stat + syst
+  std::string isoN("NUM_TightRelIso_DEN_MediumID_eta_pt");//FIXME tight iso?
   std::string isoN1("NUM_TightRelIso_DEN_MediumID_eta_pt");//FIXME: only stat available for GH for 2016 legacy
 #if defined(MC_2017)
   trigN = "IsoMu27_PtEtaBins/abseta_pt_ratio";
-  idN = "NUM_MediumID_DEN_genTracks_pt_abseta_syst";
-  isoN = "NUM_TightRelIso_DEN_MediumID_pt_abseta_syst";
+  //idN = "NUM_MediumID_DEN_genTracks_pt_abseta_syst";
+  //isoN = "NUM_TightRelIso_DEN_MediumID_pt_abseta_syst";
+  idN = "NUM_MediumID_DEN_genTracks_pt_abseta"; //use this to get total unc = stat + syst
+  isoN = "NUM_TightRelIso_DEN_MediumID_pt_abseta";
 #endif
 #if defined(MC_2018)
   trigN = "IsoMu24_PtEtaBins/abseta_pt_ratio";
-  idN = "NUM_MediumID_DEN_TrackerMuons_pt_abseta_syst";
-  isoN = "NUM_TightRelIso_DEN_MediumID_pt_abseta_syst";
+  //idN = "NUM_MediumID_DEN_TrackerMuons_pt_abseta_syst";
+  //isoN = "NUM_TightRelIso_DEN_MediumID_pt_abseta_syst";
+  idN = "NUM_MediumID_DEN_TrackerMuons_pt_abseta";
+  isoN = "NUM_TightRelIso_DEN_MediumID_pt_abseta";
 #endif
   for(std::string fN : fName_trig) {
     TFile* f = new TFile(fN.c_str(),"READ");
@@ -91,6 +98,8 @@ void Selector::SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<s
   for(float w : w_trig) m_muonTrig_w.push_back(w) ;
   for(float w : w_iso) m_muonIso_w.push_back(w) ;
   for(float w : w_ID) m_muonID_w.push_back(w) ;
+
+  m_muonUncType = muonUncType;
 }
 
 void Selector::SetPileupSF(std::string fName_puSF) {
@@ -158,7 +167,7 @@ float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string jet_main_bt
 
 //Get scale factors from a list of calibration histograms h (each histo corresponds to a run periods, for example muon in 2016 has scale factors for B->F and G->H sets. w are weights for each sets 
 std::vector<float> Selector::GetSF_2DHist(float x, float y, std::vector<TH2F*> h, std::vector<float> w) {
-  std::vector<float> o{1,0};
+  std::vector<float> o{1,0,0}; //value, absolute error, relative error
   unsigned nX = h[0]->GetNbinsX() ;
   unsigned nY = h[0]->GetNbinsY() ;
   unsigned iX = h[0]->GetXaxis()->FindFixBin(x) ;
@@ -175,35 +184,102 @@ std::vector<float> Selector::GetSF_2DHist(float x, float y, std::vector<TH2F*> h
   e_sf = sqrt(e_sf) ;
   o[0] = sf ;
   o[1] = e_sf ;
+  if(sf!=0) o[2] = e_sf/sf; //relative error
+  else o[2] = 0.;
+
   return o ;
 }
 
 float Selector::CalEleSF(LepObj e1, LepObj e2) {
-  std::vector<TH2F*> h{m_hSF_eleRec};
   std::vector<float> w{1.0};
-  float sf = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w)[0] ; 
-  sf *= GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(),h,w)[0] ;
+  float sf = 1;
+  float err = 0; //relative error treated as uncorrelated = (dy/y)^2 = sum[(dxi/xi)^2]
+  //reconstruction
+  std::vector<TH2F*> h{m_hSF_eleRec};
+  //first lepton
+  std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w) ;
+  sf = sfs[0]; 
+  err += sfs[2]*sfs[2]; //2=relative error
+  //second lepton
+  sfs = GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(),h,w);
+  sf *= sfs[0] ;
+  err += sfs[2]*sfs[2]; //2=relative error
+  
+  //ID
   h[0] = m_hSF_eleID;
-  sf *= GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w)[0] ; 
-  sf *= GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(),h,w)[0] ; 
-  return sf ; 
+  //first lepton
+  sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w);
+  sf *= sfs[0] ;
+  err += sfs[2]*sfs[2];
+  //second lepton
+  sfs = GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(),h,w);
+  sf *= sfs[0] ; 
+  err += sfs[2]*sfs[2];
+
+  err = sqrt(err);
+  if (m_eleUncType == "up") sf = sf*(1+err);
+  if (m_eleUncType == "down") sf = sf*(1-err);
+
+  return sf; 
 }
 
 float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
-  //id SFs
-  float sf(1.0) ;
+  float sf(1.0);
+  float err(0.0);
 #ifdef MC_2016
-  sf *= GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonID, m_muonID_w)[0];
-  sf *= GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(), m_hSF_muonID, m_muonID_w)[0];
-  sf *= GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonIso, m_muonIso_w)[0];
-  sf *= GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(), m_hSF_muonIso, m_muonIso_w)[0];
+  //////////////
+  //ID
+  //////////////
+  //first lepton
+  std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonID, m_muonID_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2]; //relative error
+  //second lepton
+  sfs = GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(), m_hSF_muonID, m_muonID_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
+  
+  /////////////////
+  //Iso
+  /////////////////
+  //first muon
+  sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonIso, m_muonIso_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
+  //second lepton
+  sfs = GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(), m_hSF_muonIso, m_muonIso_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
 #endif
 #if defined(MC_2017) || defined(MC_2018)
-  sf *= GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonID, m_muonID_w)[0];
-  sf *= GetSF_2DHist(e2.m_lvec.Pt(),fabs(e2.m_lvec.Eta()), m_hSF_muonID, m_muonID_w)[0];
-  sf *= GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w)[0];
-  sf *= GetSF_2DHist(e2.m_lvec.Pt(),fabs(e2.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w)[0];
+  ///////////
+  //ID
+  ///////////
+  //first muon
+  std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonID, m_muonID_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
+  //second muon
+  sfs = GetSF_2DHist(e2.m_lvec.Pt(),fabs(e2.m_lvec.Eta()), m_hSF_muonID, m_muonID_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
+  
+  ///////////
+  //Iso
+  ///////////
+  //first muon
+  sfs = GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
+  //second muon
+  sfs = GetSF_2DHist(e2.m_lvec.Pt(),fabs(e2.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
 #endif
+  err = sqrt(err);
+  if (m_muonUncType == "up") sf = sf*(1+err);
+  if (m_muonUncType == "down") sf = sf*(1-err);
+
   return sf ;
 }
 
@@ -231,7 +307,7 @@ TLorentzVector Selector::GetTrigObj(Reader* r, unsigned id, unsigned bits, float
 
 float Selector::CalTrigSF(int id, LepObj lep1, LepObj lep2, TLorentzVector trigObj, TH1D* h_dR1_trig, TH1D* h_dR2_trig, TH1D* h_pt1_trig, TH1D* h_pt2_trig) {
   
-  float trigSF(1.0) ;
+  float trigSF = 1.0 ;
   if (trigObj.Pt() < 0.01) return trigSF ; //empty trigger object
   float dR1 = lep1.m_lvec.DeltaR(trigObj) ;
   float dR2 = lep2.m_lvec.DeltaR(trigObj) ;
@@ -240,20 +316,32 @@ float Selector::CalTrigSF(int id, LepObj lep1, LepObj lep2, TLorentzVector trigO
   if ((dR1 < dR2) && (dR1 < 0.2)) {
     h_pt1_trig->Fill(lep1.m_lvec.Pt()) ;
     if (id == 13) {
-      trigSF = GetSF_2DHist(fabs(lep1.m_lvec.Eta()),lep1.m_lvec.Pt(), m_hSF_muonTrig, m_muonTrig_w)[0] ;
+      std::vector<float> sfTmp = GetSF_2DHist(fabs(lep1.m_lvec.Eta()),lep1.m_lvec.Pt(), m_hSF_muonTrig, m_muonTrig_w) ;
+      trigSF = sfTmp[0];
+      if (m_muonUncType == "trigup") trigSF = sfTmp[0]*(1+sfTmp[2]);
+      if (m_muonUncType == "trigdown") trigSF = sfTmp[0]*(1-sfTmp[2]);
     }
     if (id == 11) {
       //SC eta
-      trigSF = GetSF_2DHist(lep1.m_scEta,lep1.m_lvec.Pt(), m_hSF_eleTrig, m_eleTrig_w)[0] ;
+      std::vector<float> sfTmp = GetSF_2DHist(lep1.m_scEta,lep1.m_lvec.Pt(), m_hSF_eleTrig, m_eleTrig_w);
+      trigSF = sfTmp[0];
+      if (m_eleUncType == "trigup") trigSF = sfTmp[0]*(1+sfTmp[2]);
+      if (m_eleUncType == "trigdown") trigSF = sfTmp[0]*(1-sfTmp[2]);
     }
   }    
   if ((dR2 < dR1) && (dR2 < 0.2)) {
     h_pt2_trig->Fill(lep2.m_lvec.Pt()) ;
     if (id == 13) {
-      trigSF = GetSF_2DHist(fabs(lep2.m_lvec.Eta()),lep2.m_lvec.Pt(), m_hSF_muonTrig, m_muonTrig_w)[0] ;
+      std::vector<float> sfTmp = GetSF_2DHist(fabs(lep2.m_lvec.Eta()),lep2.m_lvec.Pt(), m_hSF_muonTrig, m_muonTrig_w) ;
+      trigSF = sfTmp[0];
+      if (m_muonUncType == "trigup") trigSF = sfTmp[0]*(1+sfTmp[2]);
+      if (m_muonUncType == "trigdown") trigSF = sfTmp[0]*(1-sfTmp[2]);
     }
     if (id == 11) {
-      trigSF = GetSF_2DHist(lep2.m_scEta,lep2.m_lvec.Pt(), m_hSF_eleTrig, m_eleTrig_w)[0] ; 
+      std::vector<float> sfTmp = GetSF_2DHist(lep2.m_scEta,lep2.m_lvec.Pt(), m_hSF_eleTrig, m_eleTrig_w) ;
+      trigSF = sfTmp[0];
+      if (m_eleUncType == "trigup") trigSF = sfTmp[0]*(1+sfTmp[2]);
+      if (m_eleUncType == "trigdown") trigSF = sfTmp[0]*(1-sfTmp[2]);
     }
   }
   

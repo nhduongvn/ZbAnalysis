@@ -213,6 +213,22 @@ int main(int argc, char *argv[]) {
   //std::string fName_lumiMaskFilter("CalibData/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt");
   std::string fName_lumiMaskFilter("CalibData/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt");
 #endif
+  
+  std::string btagUncType = "central";
+  if (syst == "BTAGU") btagUncType = "up";
+  if (syst == "BTAGD") btagUncType = "down";
+
+  std::string eleUncType = "central";
+  std::string muonUncType = "central";
+  if (syst == "ELEU") eleUncType = "up";
+  if (syst == "ELED") eleUncType = "down";
+  if (syst == "ELETU") eleUncType = "trigup";
+  if (syst == "ELETD") eleUncType = "trigdown";
+  if (syst == "MUONU") muonUncType = "up";
+  if (syst == "MUOND") muonUncType = "down";
+  if (syst == "MUONTU") muonUncType = "trigup";
+  if (syst == "MUONTD") muonUncType = "trigdown";
+
 
 #ifdef MC_2016
   fName_btagSF = "CalibData/DeepCSV_2016LegacySF_WP_V1.csv" ;
@@ -234,6 +250,8 @@ int main(int argc, char *argv[]) {
   lw_muonIso.push_back(0.5);//FIXME
 
   fName_puSF = "CalibData/2016_pileup_ratio.root";
+  if (syst == "PUU") fName_puSF = "CalibData/2016_pileup_ratio_up.root";
+  if (syst == "PUD") fName_puSF = "CalibData/2016_pileup_ratio_down.root";
 #endif
 #ifdef MC_2017
   fName_btagSF = "CalibData/DeepCSV_94XSF_WP_V4_B_F.csv";
@@ -249,6 +267,8 @@ int main(int argc, char *argv[]) {
   lw_muonIso.push_back(1.);
 
   fName_puSF = "CalibData/2017_pileup_ratio.root";
+  if (syst == "PUU") fName_puSF = "CalibData/2017_pileup_ratio_up.root";
+  if (syst == "PUD") fName_puSF = "CalibData/2017_pileup_ratio_down.root";
 #endif
 #ifdef MC_2018
   fName_btagSF = "CalibData/DeepCSV_102XSF_WP_V1.csv";
@@ -266,15 +286,17 @@ int main(int argc, char *argv[]) {
   lw_muonIso.push_back(1.);
 
   fName_puSF = "CalibData/2018_pileup_ratio.root";
+  if (syst == "PUU") fName_puSF = "CalibData/2018_pileup_ratio_up.root";
+  if (syst == "PUD") fName_puSF = "CalibData/2018_pileup_ratio_down.root";
 #endif
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
   sel.SetRandom() ; //used for muon rochestor correction (used when correcting for MC)
-  if (CUTS.GetStr("jet_main_btagWP")=="deepCSVT") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effT.root");
-  if (CUTS.GetStr("jet_main_btagWP")=="deepJetT") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effT.root");
-  if (CUTS.GetStr("jet_main_btagWP")=="deepCSVM") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effM.root");
-  if (CUTS.GetStr("jet_main_btagWP")=="deepJetM") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effM.root");
-  sel.SetEleEffCorr(fName_eleTrig,fName_eleRecSF,fName_eleIDSF,lw_eleTrig);
-  sel.SetMuonEffCorr(fName_muonTrig,fName_muonID,fName_muonIso,lw_muonTrig,lw_muonID,lw_muonIso);
+  if (CUTS.GetStr("jet_main_btagWP")=="deepCSVT") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effT.root",btagUncType);
+  if (CUTS.GetStr("jet_main_btagWP")=="deepJetT") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effT.root",btagUncType);
+  if (CUTS.GetStr("jet_main_btagWP")=="deepCSVM") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effM.root",btagUncType);
+  if (CUTS.GetStr("jet_main_btagWP")=="deepJetM") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effM.root",btagUncType);
+  sel.SetEleEffCorr(fName_eleTrig,fName_eleRecSF,fName_eleIDSF,lw_eleTrig,eleUncType);
+  sel.SetMuonEffCorr(fName_muonTrig,fName_muonID,fName_muonIso,lw_muonTrig,lw_muonID,lw_muonIso,muonUncType);
   sel.SetPileupSF(fName_puSF);
 #endif
   sel.SetRochesterCorr(fName_roc) ;
