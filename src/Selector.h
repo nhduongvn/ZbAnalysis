@@ -49,6 +49,8 @@ class Selector
 #endif
   virtual float MuonRcSF(Reader* r, LepObj lep, int pdgId) ;
 
+  virtual void SetJetMetSyst(std::string jetmetsystType) {m_jetmetSystType = jetmetsystType;};
+
 
   bool m_isData ;
   std::string m_year ;
@@ -77,6 +79,7 @@ class Selector
   std::string m_btagUncType;
   std::string m_eleUncType;
   std::string m_muonUncType;
+  std::string m_jetmetSystType;
 
   TH1D* m_hSF_pu;
 

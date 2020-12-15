@@ -150,23 +150,24 @@ int main(int argc, char *argv[]) {
   std::cout << std::endl ;
 
   SetParameters(cfgfilename,CUTS) ;
-  
-  std::string chainName("Events") ;
-  TChain chain(chainName.c_str()) ;
-  for ( std::vector<std::string>::const_iterator it = filenames.begin();
-	it != filenames.end(); it++) 
-    {
-      cout << "reading file " << it->c_str() << endl;
-      int retcode = chain.Add(it->c_str(),-1);
-      if ( retcode == 0 ) {
-	throw std::invalid_argument("the file "+*it+" does not exist of does not contain the tree named "+chainName);
-      }
-    }
 
+#if defined(TFILE)
+  TFile* f = TFile::Open(filenames[0].c_str());
+  TTree* chain = (TTree*)f->Get("Events");
+#endif
+#if defined(TCHAIN)
+  std::string chainName("Events") ;
+  TChain* chain = new TChain(chainName.c_str()) ;
+  for ( std::vector<std::string>::const_iterator it = filenames.begin();it != filenames.end(); it++) {
+    cout << "reading file " << it->c_str() << endl;
+    int retcode = chain->Add(it->c_str(),-1);
+    if ( retcode == 0 ) throw std::invalid_argument("the file "+*it+" does not exist of does not contain the tree named "+chainName);
+  }
+#endif 
   //chain.Add("/uscms/home/duong/Scratch/test/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_18644D51-7512-5642-B506-C8B6BA051047.root") ;
   
-  std::cout << "\n Number of events: " << chain.GetEntries() ;
-  if (intlastentry == -1) intlastentry = chain.GetEntries() ;
+  std::cout << "\n Number of events: " << chain->GetEntries() ;
+  if (intlastentry == -1) intlastentry = chain->GetEntries() ;
   
   Processor ana ;
   ana.setOutPutFileName(outputfilename) ;
@@ -304,12 +305,24 @@ int main(int argc, char *argv[]) {
   sel.SetLumiMaskFilter(fName_lumiMaskFilter);
 #endif
 
+  if (syst == "JETNOM") sel.SetJetMetSyst("jetnom");
+  if (syst == "METNOM") sel.SetJetMetSyst("metnom");
+  if (syst == "JETMETNOM") sel.SetJetMetSyst("jetmetnom");
+  if (syst == "JESU") sel.SetJetMetSyst("jesu");
+  if (syst == "JESD") sel.SetJetMetSyst("jesd");
+  if (syst == "JERU") sel.SetJetMetSyst("jeru");
+  if (syst == "JERD") sel.SetJetMetSyst("jerd");
+  if (syst == "METJESU") sel.SetJetMetSyst("metjesu");
+  if (syst == "METJESD") sel.SetJetMetSyst("metjesd");
+  if (syst == "METJERU") sel.SetJetMetSyst("metjeru");
+  if (syst == "METJERD") sel.SetJetMetSyst("metjerd");
+
   sels.push_back(&sel) ;
   
   //add all selectors to processors
   for (std::vector<Selector*>::iterator it = sels.begin() ; it != sels.end() ; it++) ana.addSelector(*it) ;
   
-  chain.Process(&ana,"",intlastentry,intfirstentry) ;
+  chain->Process(&ana,"",intlastentry,intfirstentry) ;
   
   return 0 ;
 }

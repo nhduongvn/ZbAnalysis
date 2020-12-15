@@ -403,7 +403,20 @@ void ZbSelection::Process(Reader* r) {
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
     jetFlav = (r->Jet_hadronFlavour)[i];
 #endif 
-    JetObj jet((r->Jet_pt)[i],(r->Jet_eta)[i],(r->Jet_phi)[i],(r->Jet_mass)[i],jetFlav,(r->Jet_btagDeepB)[i],(r->Jet_btagDeepFlavB)[i]) ;
+    
+    float jetPt = (r->Jet_pt)[i];
+
+#if defined(JETMETSYST)
+    if (m_jetmetSystType == "jetnom" || m_jetmetSystType == "jetmetnom") jetPt = (r->Jet_pt_nom)[i];
+    if (m_jetmetSystType == "jesu") jetPt = (r->Jet_pt_jesTotalUp)[i];
+    if (m_jetmetSystType == "jesd") jetPt = (r->Jet_pt_jesTotalDown)[i];
+    if (m_jetmetSystType == "jeru") jetPt = (r->Jet_pt_jerUp)[i];
+    if (m_jetmetSystType == "jerd") jetPt = (r->Jet_pt_jerDown)[i];
+#endif
+
+    //std::cout << "\n Jet pt: " << m_jetmetSystType << " " << jetPt;
+
+    JetObj jet(jetPt,(r->Jet_eta)[i],(r->Jet_phi)[i],(r->Jet_mass)[i],jetFlav,(r->Jet_btagDeepB)[i],(r->Jet_btagDeepFlavB)[i]) ;
     jet.SetSV(lvec_SVs);
 
     if (jet.m_lvec.Pt() < CUTS.Get<float>("jet_pt") || fabs(jet.m_lvec.Eta()) > CUTS.Get<float>("jet_eta")) continue ;
