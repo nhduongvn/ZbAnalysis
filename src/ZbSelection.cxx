@@ -48,6 +48,9 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_zmm_2bjet_XX = new Z2bPlots("Zmm_2bjet_XX") ; //two tagged bjets are bb
   h_zmm_bjet_deepJet = new ZbPlots("Zmm_bjetDeepJet") ;
   h_zmm_2bjet_deepJet = new Z2bPlots("Zmm_2bjetDeepJet") ;
+
+  h_emu_2bjet_eleTrig = new ElMu2bPlots("ElMu_2bjet_eleTrig");
+  h_emu_2bjet_muTrig = new ElMu2bPlots("ElMu_2bjet_muTrig");
   
   unsigned nBins = 9 ;
   float bins[10] = {20, 30, 50, 70, 100, 140, 200, 300, 600, 1000} ;
@@ -151,6 +154,11 @@ void ZbSelection::SlaveBegin(Reader* r) {
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
   tmp = h_zmm_2bjet_deepJet->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
+  tmp = h_emu_2bjet_eleTrig->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  tmp = h_emu_2bjet_muTrig->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
   tmp = h_eff_b->returnHisto() ;
@@ -813,6 +821,37 @@ void ZbSelection::Process(Reader* r) {
   FillUnfolding_1(zee_rec_afterMET_uf,zee_gen_uf,h_zee_afterMET_unfolding,w_zee_rec_afterMET_uf,genWeight); 
   FillUnfolding_1(zmm_rec_afterMET_uf,zmm_gen_uf,h_zmm_afterMET_unfolding,w_zmm_rec_afterMET_uf,genWeight); 
 #endif
+
+  ////////////////////////////////////////
+  // Zem + 2b-jets (electron trigger)
+  ////////////////////////////////////////
+  
+  // We want to be able to have the background estimation for the Z->ee
+  // case and we need to use the electron trigger.
+  // make sure we have at least one of each lepton
+  if (eles.size() >= 1 && muons.size() >= 1)
+  {
+    float eleSF_w_tmp = CalSingleEleSF(eles[0]);
+    float muonSF_w_tmp = CalSingleMuonSF_id_iso(muons[0]);
+    float trigSF_ele_tmp = CalTrigSF_singleLepton(11, eles[0], trigObj_ele);
+    float trigSF_mu_tmp = CalTrigSF_singleLepton(13, muons[0], trigObj_muon);
+    float zem_noTrig_w = evtW*eleSF_w_tmp*muonSF_w_tmp;
+    // make sure the masses meet our cuts
+    if ((eles[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0") && muons[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt1")) ||
+        (eles[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt1") && muons[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0")))
+    {
+      if (bjets.size() >= 2)
+      {
+        if (*(r->MET_pt) > 80.0) {
+          if (eleTrig) h_emu_2bjet_eleTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],*(r->MET_pt),zem_noTrig_w*trigSF_ele_tmp);
+          if (muonTrig) h_emu_2bjet_muTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],*(r->MET_pt),zem_noTrig_w*trigSF_mu_tmp);
+        }
+      }
+      
+    }//end-pt-cut
+
+  }//end-size
+
 
   return;
 

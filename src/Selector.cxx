@@ -223,6 +223,31 @@ float Selector::CalEleSF(LepObj e1, LepObj e2) {
   return sf; 
 }
 
+float Selector::CalSingleEleSF(LepObj e1) {
+  std::vector<float> w{1.0};
+  float sf = 1;
+  float err = 0; //relative error treated as uncorrelated = (dy/y)^2 = sum[(dxi/xi)^2]
+  //reconstruction
+  std::vector<TH2F*> h{m_hSF_eleRec};
+  //first lepton
+  std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w) ;
+  sf = sfs[0]; 
+  err += sfs[2]*sfs[2]; //2=relative error
+  
+  //ID
+  h[0] = m_hSF_eleID;
+  //first lepton
+  sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w);
+  sf *= sfs[0] ;
+  err += sfs[2]*sfs[2];
+
+  err = sqrt(err);
+  if (m_eleUncType == "up") sf = sf*(1+err);
+  if (m_eleUncType == "down") sf = sf*(1-err);
+
+  return sf; 
+}
+
 float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
   float sf(1.0);
   float err(0.0);
@@ -273,6 +298,50 @@ float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
   err += sfs[2]*sfs[2];
   //second muon
   sfs = GetSF_2DHist(e2.m_lvec.Pt(),fabs(e2.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
+#endif
+  err = sqrt(err);
+  if (m_muonUncType == "up") sf = sf*(1+err);
+  if (m_muonUncType == "down") sf = sf*(1-err);
+
+  return sf ;
+}
+
+float Selector::CalSingleMuonSF_id_iso(LepObj e1) {
+  float sf(1.0);
+  float err(0.0);
+#ifdef MC_2016
+  //////////////
+  //ID
+  //////////////
+  //first lepton
+  std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonID, m_muonID_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2]; //relative error
+  
+  /////////////////
+  //Iso
+  /////////////////
+  //first muon
+  sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonIso, m_muonIso_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
+#endif
+#if defined(MC_2017) || defined(MC_2018)
+  ///////////
+  //ID
+  ///////////
+  //first muon
+  std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonID, m_muonID_w);
+  sf *= sfs[0];
+  err += sfs[2]*sfs[2];
+  
+  ///////////
+  //Iso
+  ///////////
+  //first muon
+  sfs = GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
 #endif
@@ -344,6 +413,30 @@ float Selector::CalTrigSF(int id, LepObj lep1, LepObj lep2, TLorentzVector trigO
       if (m_eleUncType == "trigdown") trigSF = sfTmp[0]*(1-sfTmp[2]);
     }
   }
+  
+  return trigSF ;
+}
+
+float Selector::CalTrigSF_singleLepton(int id, LepObj lep1, TLorentzVector trigObj) {
+  
+  float trigSF = 1.0 ;
+  if (trigObj.Pt() < 0.01) return trigSF ; //empty trigger object
+  float dR1 = lep1.m_lvec.DeltaR(trigObj) ;
+  if ((dR1 < 0.2)) {
+    if (id == 13) {
+      std::vector<float> sfTmp = GetSF_2DHist(fabs(lep1.m_lvec.Eta()),lep1.m_lvec.Pt(), m_hSF_muonTrig, m_muonTrig_w) ;
+      trigSF = sfTmp[0];
+      if (m_muonUncType == "trigup") trigSF = sfTmp[0]*(1+sfTmp[2]);
+      if (m_muonUncType == "trigdown") trigSF = sfTmp[0]*(1-sfTmp[2]);
+    }
+    if (id == 11) {
+      //SC eta
+      std::vector<float> sfTmp = GetSF_2DHist(lep1.m_scEta,lep1.m_lvec.Pt(), m_hSF_eleTrig, m_eleTrig_w);
+      trigSF = sfTmp[0];
+      if (m_eleUncType == "trigup") trigSF = sfTmp[0]*(1+sfTmp[2]);
+      if (m_eleUncType == "trigdown") trigSF = sfTmp[0]*(1-sfTmp[2]);
+    }
+  }    
   
   return trigSF ;
 }

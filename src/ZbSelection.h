@@ -45,6 +45,9 @@ private:
   ZbPlots* h_zmm_bjet_deepJet ;
   Z2bPlots* h_zee_2bjet_deepJet ;
   Z2bPlots* h_zmm_2bjet_deepJet ;
+
+  ElMu2bPlots* h_emu_2bjet_eleTrig;
+  ElMu2bPlots* h_emu_2bjet_muTrig;
  
   EffPlots* h_eff_b ;
   EffPlots* h_eff_c ;

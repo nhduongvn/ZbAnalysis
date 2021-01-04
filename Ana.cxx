@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
   int intisdata=0;
   int intfirstentry=0;
   long int intlastentry=-1;
-  string syst = "none";
+  string syst = "NONE";
   string year = "";
 
   if (arg.Key("-data")) intisdata = arg.Get<int>("-data");
@@ -239,16 +239,16 @@ int main(int argc, char *argv[]) {
   lw_eleTrig.push_back(1.0);//FIXME for place holder
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_RunBtoF_trigger_2016_muon.root");
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_Period4_trigger_mu2016_muon.root");
-  lw_muonTrig.push_back(0.5);//FIXME
-  lw_muonTrig.push_back(0.5);//FIXME
+  lw_muonTrig.push_back(0.548);
+  lw_muonTrig.push_back(0.455);
   fName_muonID.push_back("CalibData/RunBCDEF_SF_ID_2016_muon.root");
   fName_muonID.push_back("CalibData/RunGH_SF_ID_2016_muon.root");
-  lw_muonID.push_back(0.5);//FIXME
-  lw_muonID.push_back(0.5);//FIXME
+  lw_muonID.push_back(0.548);
+  lw_muonID.push_back(0.455);
   fName_muonIso.push_back("CalibData/RunBCDEF_SF_ISO_2016_muon.root");
   fName_muonIso.push_back("CalibData/RunGH_SF_ISO_2016_muon.root");
-  lw_muonIso.push_back(0.5);//FIXME
-  lw_muonIso.push_back(0.5);//FIXME
+  lw_muonIso.push_back(0.548);
+  lw_muonIso.push_back(0.455);
 
   fName_puSF = "CalibData/2016_pileup_ratio.root";
   if (syst == "PUU") fName_puSF = "CalibData/2016_pileup_ratio_up.root";
@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
   fName_eleTrig.push_back("CalibData/sf_ele_2017_trig_v5.root");
   fName_eleRecSF = "CalibData/egammaEffi.txt_EGM2D_runBCDEF_passingRECO_2017.root";
   fName_eleIDSF = "CalibData/2017_ElectronTight.root";
-  lw_eleTrig.push_back(1.0);//FIXME for place holder
+  lw_eleTrig.push_back(1.0);
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_RunBtoF_Nov17Nov2017_trigger_muon.root");
   lw_muonTrig.push_back(1.);
   fName_muonID.push_back("CalibData/RunBCDEF_SF_ID_syst_2017_muon.root");
@@ -276,11 +276,11 @@ int main(int argc, char *argv[]) {
   fName_eleTrig.push_back("CalibData/sf_ele_2018_trig_v5.root");
   fName_eleRecSF = "CalibData/egammaEffi.txt_EGM2D_updatedAll_2018.root";
   fName_eleIDSF = "CalibData/2018_ElectronTight.root";
-  lw_eleTrig.push_back(1.0);//FIXME for place holder
+  lw_eleTrig.push_back(1.0);
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_2018Data_BeforeMuonHLTUpdate_trigger_muon.root");
   fName_muonTrig.push_back("CalibData/EfficienciesAndSF_2018Data_AfterMuonHLTUpdate_trigger_muon.root");
-  lw_muonTrig.push_back(0.5);//FIXME
-  lw_muonTrig.push_back(0.5);//FIXME 
+  lw_muonTrig.push_back(0.034);
+  lw_muonTrig.push_back(0.966);
   fName_muonID.push_back("CalibData/RunABCD_SF_ID_2018_muon.root");
   lw_muonID.push_back(1.);
   fName_muonIso.push_back("CalibData/RunABCD_SF_ISO_2018_muon.root");

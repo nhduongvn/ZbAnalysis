@@ -40,8 +40,11 @@ class Selector
   virtual std::vector<float> GetSF_2DHist(float x, float y, std::vector<TH2F*> h, std::vector<float> w);
   virtual float CalBtagWeight(std::vector<JetObj>& jets, std::string jet_main_bTagWP="deepCSVT", std::string uncType="central") ;
   virtual float CalEleSF(LepObj e1, LepObj e2);
+  virtual float CalSingleEleSF(LepObj e1);
   virtual float CalMuonSF_id_iso(LepObj e1, LepObj e2);
+  virtual float CalSingleMuonSF_id_iso(LepObj e1);
   virtual float CalTrigSF(int id, LepObj lep1, LepObj lep2, TLorentzVector trigObj, TH1D* h_dR1_trig, TH1D* h_dR2_trig, TH1D* h_pt1_trig, TH1D* h_pt2_trig) ;
+  virtual float CalTrigSF_singleLepton(int id, LepObj lep1, TLorentzVector trigObj);
   virtual TLorentzVector GetTrigObj(Reader* r, unsigned id, unsigned bits, float ptThresh) ;
 
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
