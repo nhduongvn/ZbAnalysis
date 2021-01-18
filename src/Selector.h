@@ -53,6 +53,15 @@ class Selector
   virtual float MuonRcSF(Reader* r, LepObj lep, int pdgId) ;
 
   virtual void SetJetMetSyst(std::string jetmetsystType) {m_jetmetSystType = jetmetsystType;};
+  virtual void SetPdfScaleSyst(std::string pdfScaleSystType) {
+    m_nScale = 0;
+    if (pdfScaleSystType=="scale") m_nScale=9;
+    m_iPdfStart = 0;
+    m_iPdfStop = 0;
+    if (pdfScaleSystType == "pdfg0") {m_iPdfStart=0; m_iPdfStop=35;}
+    if (pdfScaleSystType == "pdfg1") {m_iPdfStart=35; m_iPdfStop=70;}
+    if (pdfScaleSystType == "pdfg2") {m_iPdfStart=70; m_iPdfStop=103;}
+  };
 
 
   bool m_isData ;
@@ -83,6 +92,10 @@ class Selector
   std::string m_eleUncType;
   std::string m_muonUncType;
   std::string m_jetmetSystType;
+
+  unsigned m_nScale;
+  unsigned m_iPdfStart;
+  unsigned m_iPdfStop;
 
   TH1D* m_hSF_pu;
 

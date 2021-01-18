@@ -1,10 +1,15 @@
 import os,sys
 import json
+import time
 
-def write_condor_config(workDir, sample_format, name_output_dir, nJob, debug = False):
+def write_condor_config(workDir, sample_format, data_name, name_output_dir, nJob, syst='none', compilewithsyst='OTHER', debug = False):
+  exe_fileName = 'exe_' + data_name + '.sh'
+  if syst != 'none':
+    exe_fileName = 'exe_' + syst + '_' + data_name + '.sh'
+
   f = open(workDir + '/condor_config.script', 'w')
   f.write('universe = vanilla \n')
-  f.write('Executable = condor_executable.sh \n')
+  f.write('Executable = '+exe_fileName+' \n')
   f.write('Arguments = $(Process) \n') 
   f.write('Should_Transfer_Files = YES \n')
   f.write('WhenToTransferOutput = ON_EXIT \n')
@@ -20,7 +25,7 @@ def write_condor_config(workDir, sample_format, name_output_dir, nJob, debug = F
   f.write(tmp)
   f.close()
 
-  f = open(workDir + '/condor_executable.sh', 'w')
+  f = open(workDir + '/' + exe_fileName, 'w')
   f.write('#!/bin/bash \n')
   f.write('echo $SHELL \n')
   f.write('source /cvmfs/cms.cern.ch/cmsset_default.sh \n')
@@ -32,15 +37,16 @@ def write_condor_config(workDir, sample_format, name_output_dir, nJob, debug = F
   f.write('cd ${_CONDOR_SCRATCH_DIR} \n')
   f.write('tar -xvf input.tar \n')
 #  f.write('make clean \n')
-  f.write('make FORMAT='+sample_format+'\n')
+  f.write('make FORMAT='+sample_format+' INPUT=TCHAIN'+' SYST='+compilewithsyst+'\n')
+
   sampleType = '0'
   if 'DATA' in sample_format:
     sampleType = '1'
   year = sample_format.split('_')[1]
   if debug:
-    f.write('./main -filelist sampleList_$1.txt -out output_$1.root -data ' + sampleType + ' -year ' + year + ' -lastentry 10000 \n')
+    f.write('./main -filelist sampleList_$1.txt -out output_$1.root -data ' + sampleType + ' -year ' + year + ' -syst ' + syst+ ' -lastentry 10000 \n')
   else:
-    f.write('./main -filelist sampleList_$1.txt -out output_$1.root -data ' + sampleType + ' -year ' + year + ' \n')
+    f.write('./main -filelist sampleList_$1.txt -out output_$1.root -data ' + sampleType + ' -year ' + year + ' -syst ' + syst+ ' \n')
   f.write('xrdcp *.root root://cmseos.fnal.gov/' + name_output_dir+ '/ \n')
   f.write('rm *.root \n')
   f.write('echo "xrdcp *.root root://cmseos.fnal.gov/' + name_output_dir + '/" \n')
@@ -69,26 +75,44 @@ def make_input_file_list(nFile, outDir_file_list, file_list_name):
 
 #///////////////////////////////////////////////////////////////////
 runMode = 1 #0: submit, 1: check output and hadd output file
-submit = False # for testing setup 
-submit = True # for executing submission 
+submit = True # for testing or executing submission 
+
+syst = 'SCALE' #NONE,PUU,PUD,BTAGU,BTAGD,ELEU,ELED,MUONU,MUOND,JETNOM,JESU,JESD,JERU,JERD,PDFG0,PDFG1,PDFG2,SCALE
+compilewithsyst = 'PDFSCALESYST' #OTHER,PDFSCALESYST,JETMETSYST
 
 debug = False 
 
-dataSet_list = "../datasets_Nano25Oct2019_json.txt"
+sourceDir = '/uscms_data/d3/duong/ZplusB_working/Ana/' #directory for source code + file lists
+condorRunDir = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/' #directory to contain files to run jobs
 
-nFile = 8
+dataSet_list = sourceDir+"/datasets_Nano02Apr2020_json.txt"
+#dataSet_list = sourceDir+"/datasets_Nano02Apr2020_json_jetmet_syst.txt"
+dataSet_list = sourceDir+"/datasets_Nano02Apr2020_DY_mg_sherpa_json.txt"
 
-dir_file_list = '../FileLists_Nano25Oct2019/'
+nFile = 4
+
+
+#dir_file_list = sourceDir+'/FileLists_Nano02Apr2020_postproc/'
+dir_file_list = sourceDir+'/FileLists_Nano02Apr2020/'
 
 outputDir_eos = '/store/user/duong/Output_ZplusB/'
-outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/V2/' 
- 
+if syst != 'NONE':
+  outputDir_eos = '/store/user/duong/Output_ZplusB/'+syst+'/'
+
+#outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/V1_nanoV7_unfolding_allWeight_tightMuonIso_tightJetID_newFillUnfolding_newDphiBBbinning/' 
+outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/' 
+if syst != 'NONE':
+  outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/'+syst+'/'
+
 
 #Print setting
 print '============================='
+print 'Systematic:                                                 ', syst
 print 'Sample list file (list of input samples):                   ', dataSet_list
 print 'Sample list folder (location of input file lists):          ', dir_file_list
 print 'Number of file per jobs:                                    ', nFile
+print 'Source dir:                                                 ', sourceDir
+print 'Condor run dir:                                             ', condorRunDir
 print 'Output location eos:                                        ', outputDir_eos 
 print 'Output location scratch:                                    ', outputDir_scratch
 
@@ -116,7 +140,9 @@ for line in lines:
   print 'Processing sample: ', line
   
   data_name = line
-  work_dir = 'condor_run_' + data_name + '_' + dir_affix
+  work_dir = condorRunDir+'/condor_run/' + data_name + '_' + dir_affix
+  if syst != 'none':
+    work_dir = condorRunDir+'/condor_run_'+syst+'/' + data_name + '_' + dir_affix
 
   sample_format = data_name.split('_')[-2] + '_' + data_name.split('_')[-1] 
   
@@ -129,8 +155,10 @@ for line in lines:
     os.system('eos root://cmseos.fnal.gov rm -r ' + dir_final_rootFile)
     os.system('eos root://cmseos.fnal.gov mkdir -p ' + dir_final_rootFile)
 
-    os.system('mkdir ' + work_dir)
+    os.system('mkdir -p ' + work_dir)
     os.system('rm -r ' + work_dir + '/*')
+    
+    os.chdir(work_dir)
     
     file_list_name = dir_file_list + '/' + data_name + '.txt' 
     print '>>>>>>> Use this file list: ', file_list_name
@@ -139,30 +167,31 @@ for line in lines:
     nJob = make_input_file_list(nFile, work_dir, file_list_name)
     
     #prepare condor job configuration
-    write_condor_config(work_dir, sample_format, dir_final_rootFile, nJob, debug)
+    write_condor_config(work_dir, sample_format, data_name, dir_final_rootFile, nJob, syst, compilewithsyst, debug)
     
     #copy codes, ....
-    os.system('cp ../Makefile ' + work_dir)
-    os.system('cp ../Ana.cxx ' + work_dir)
-    os.system('cp ../StdArg.hpp ' + work_dir)
-    os.system('cp -r ../src/ ' + work_dir)
-    os.system('cp -r ../Configs/ ' + work_dir)
-    os.system('cp -r ../CalibData/ ' + work_dir)
+    os.system('cp '+sourceDir+'/Makefile ' + work_dir)
+    os.system('cp '+sourceDir+'/Ana.cxx ' + work_dir)
+    os.system('cp '+sourceDir+'/StdArg.hpp ' + work_dir)
+    os.system('cp -r '+sourceDir+'/src/ ' + work_dir)
+    os.system('cp -r '+sourceDir+'/Configs/ ' + work_dir)
+    os.system('cp -r '+sourceDir+'/CalibData/ ' + work_dir)
+    os.system('cp -r '+sourceDir+'/yaml-cpp/ ' + work_dir)
 
-    os.chdir(work_dir)
-    os.system('tar -cf input.tar Makefile *.cxx *.hpp src/ Configs/ CalibData/ sampleList_*.txt')
+    os.system('tar -cf input.tar Makefile *.cxx *.hpp src/ Configs/ CalibData/ yaml-cpp/ sampleList_*.txt')
     
     #submit jobs
     if submit: 
         os.system('condor_submit condor_config.script')
-
-    os.chdir('../')
+    
+    #os.chdir(sourceDir)
 
 ########################################################
   if runMode == 1:
     os.chdir(work_dir)
     #calculate how many jobs submitted
     os.system('ls sampleList_*.txt >| tmp.txt')
+    time.sleep(1)
     lines_tmp = open('tmp.txt', 'r').readlines()
     nJob = len(lines_tmp)
     #get list of output root files
@@ -183,4 +212,4 @@ for line in lines:
     print cmd_hadd
     os.system(cmd_hadd)
          
-    os.chdir('../')
+    #os.chdir('../../')

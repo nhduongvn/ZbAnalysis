@@ -52,8 +52,8 @@ for y in ['16','17','18']:
   totLumis += lumis[y]
 
 #pltNames = ['pt_b1','dR_2b','pt_Z','dR_2b','dPhi_2b','dRmin_Z2b','A_Z2b','m_2b','m_Z2b']
-pltNames = ['pt_b1','pt_b2','pt_Z','dR_2b','dRmin_Z2b','A_Z2b','m_2b','m_Z2b']
-#pltNames=['pt_b1']
+#pltNames = ['pt_b1','pt_b2','pt_Z','dR_2b','dRmin_Z2b','A_Z2b','m_2b','m_Z2b']
+pltNames=['pt_b1']
 chans = ['Electron','Muon','Combined']
 
 #loop over plot name

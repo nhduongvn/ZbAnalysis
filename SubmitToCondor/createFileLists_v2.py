@@ -1,11 +1,14 @@
 import os,sys
 import json
+import time
 import subprocess
 
 #########################################################
-samples_json = "../datasets_Nano25Oct2019_json.txt"
+#samples_json = "../datasets_Nano25Oct2019_DY_madgraph_json.txt"
+#samples_json = "../tmp_json.txt"
+samples_json = "../datasets_Nano02Apr2020_data_json.txt"
 
-outDir = '../FileLists_Nano25Oct2019/'
+outDir = '../FileLists_tmp/'
 os.system('mkdir ' + outDir)
 
 samples_input = []
@@ -35,6 +38,7 @@ for k in samples_used:
     #cmd = 'dasgoclient --query="file dataset=' + s + '"'
     print(cmd)
     os.system(cmd)
+    time.sleep(3)
     #p=subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     #p.wait()
     #result_str = p.stdout.read()

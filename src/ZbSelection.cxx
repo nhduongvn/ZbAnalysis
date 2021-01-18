@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 
 #include "TList.h"
 #include "TParameter.h"
@@ -18,6 +19,8 @@
 
 using namespace std;
 float PI = M_PI;
+//unsigned NPDF = 103; 
+//unsigned NSCALE = 9;
 
 //ZbSelection::ZbSelection(bool isData, std::string year) : Selector(isData, year), h_zee_jet(0), h_zmm_jet(0) {}
 
@@ -28,6 +31,8 @@ ZbSelection::~ZbSelection() {
 
 void ZbSelection::SlaveBegin(Reader* r) {
   h_evt = new TH1D("Nevt","",3,-1.5,1.5) ;
+  h_pdfW = new TH2D("iPdf_vs_pdfW","",120,0,120,2000,0,2);
+  h_scaleW = new TH2D("iScale_vs_scaleW","",10,0,10,500,0,5);
   h_zee_jet = new ZbPlots("Zee_jet") ;
   h_zee_bjet = new ZbPlots("Zee_bjet") ;
   h_zee_bjet_afterMET = new ZbPlots("Zee_bjet_afterMET") ;
@@ -64,9 +69,25 @@ void ZbSelection::SlaveBegin(Reader* r) {
   //Unfolding plots
   h_zee_unfolding = new UnfoldingPlots("zee");
   h_zmm_unfolding = new UnfoldingPlots("zmm");
-  
   h_zee_afterMET_unfolding = new UnfoldingPlots("zee_afterMET");
   h_zmm_afterMET_unfolding = new UnfoldingPlots("zmm_afterMET");
+
+
+#if defined(PDFSCALESYST)
+  for(unsigned iPdf=m_iPdfStart;iPdf < m_iPdfStop;++iPdf) {
+    h_zee_unfolding_pdf.push_back(new UnfoldingPlots("zee_pdf"+std::to_string(iPdf)));
+    h_zmm_unfolding_pdf.push_back(new UnfoldingPlots("zmm_pdf"+std::to_string(iPdf)));
+    h_zee_afterMET_unfolding_pdf.push_back(new UnfoldingPlots("zee_afterMET_pdf"+std::to_string(iPdf)));
+    h_zmm_afterMET_unfolding_pdf.push_back(new UnfoldingPlots("zmm_afterMET_pdf"+std::to_string(iPdf)));
+  }
+  for(unsigned iScale=0;iScale < m_nScale;++iScale) {
+    h_zee_unfolding_scale.push_back(new UnfoldingPlots("zee_scale"+std::to_string(iScale)));
+    h_zmm_unfolding_scale.push_back(new UnfoldingPlots("zmm_scale"+std::to_string(iScale)));
+    h_zee_afterMET_unfolding_scale.push_back(new UnfoldingPlots("zee_afterMET_scale"+std::to_string(iScale)));
+    h_zmm_afterMET_unfolding_scale.push_back(new UnfoldingPlots("zmm_afterMET_scale"+std::to_string(iScale))); 
+  }
+
+#endif
 
   h_dR_je = new TH1D("h_dR_je","",500,0,5) ;
   h_dR_jm = new TH1D("h_dR_jm","",500,0,5) ;
@@ -101,6 +122,8 @@ void ZbSelection::SlaveBegin(Reader* r) {
 
   //Add histograms to fOutput so they can be saved in Processor::SlaveTerminate
   r->GetOutputList()->Add(h_evt) ;
+  r->GetOutputList()->Add(h_pdfW);
+  r->GetOutputList()->Add(h_scaleW);
 
   std::vector<TH1*> tmp = h_zee_jet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
@@ -184,7 +207,29 @@ void ZbSelection::SlaveBegin(Reader* r) {
   tmp = h_zmm_afterMET_unfolding->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-
+#if defined(PDFSCALESYST)
+  for(unsigned iPdf=0;iPdf<(m_iPdfStop-m_iPdfStart);++iPdf) {
+    tmp = h_zee_unfolding_pdf[iPdf]->returnHisto() ;
+    for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+    tmp = h_zmm_unfolding_pdf[iPdf]->returnHisto() ;
+    for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+    tmp = h_zee_afterMET_unfolding_pdf[iPdf]->returnHisto() ;
+    for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+    tmp = h_zmm_afterMET_unfolding_pdf[iPdf]->returnHisto() ;
+    for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  }
+  
+  for(unsigned iScale=0;iScale<m_nScale;++iScale) {
+    tmp = h_zee_unfolding_scale[iScale]->returnHisto() ;
+    for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+    tmp = h_zmm_unfolding_scale[iScale]->returnHisto() ;
+    for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+    tmp = h_zee_afterMET_unfolding_scale[iScale]->returnHisto() ;
+    for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+    tmp = h_zmm_afterMET_unfolding_scale[iScale]->returnHisto() ;
+    for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  }
+#endif
   r->GetOutputList()->Add(h_dR_je) ;
   r->GetOutputList()->Add(h_dR_jm) ;
   //r->GetOutputList()->Add(h_nMuon) ;
@@ -234,6 +279,8 @@ void ZbSelection::Process(Reader* r) {
   if (*(r->genWeight) > 0) h_evt->Fill(1) ;
   puSF = PileupSF(*(r->Pileup_nTrueInt));
 #endif
+
+
 
 #if defined(MC_2016) || defined(MC_2017)
   l1preW = *(r->L1PreFiringWeight_Nom);  
@@ -820,6 +867,29 @@ void ZbSelection::Process(Reader* r) {
   FillUnfolding_1(zmm_rec_uf,zmm_gen_uf,h_zmm_unfolding,w_zmm_rec_uf,genWeight); 
   FillUnfolding_1(zee_rec_afterMET_uf,zee_gen_uf,h_zee_afterMET_unfolding,w_zee_rec_afterMET_uf,genWeight); 
   FillUnfolding_1(zmm_rec_afterMET_uf,zmm_gen_uf,h_zmm_afterMET_unfolding,w_zmm_rec_afterMET_uf,genWeight); 
+  //std::cout << "\n " << genWeight << " " << *(r->LHEWeight_originalXWGTUP) << " " << *(r->nLHEPdfWeight) << " " << *(r->nLHEScaleWeight) << " " << (r->LHEPdfWeight)[0] << " " << (r->LHEPdfWeight)[1] << " " << (r->LHEScaleWeight)[0];
+  for(unsigned iPdf=0;iPdf < *(r->nLHEPdfWeight);++iPdf) h_pdfW->Fill(iPdf+0.5,(r->LHEPdfWeight)[iPdf]);
+  for(unsigned iScale=0;iScale < *(r->nLHEScaleWeight);++iScale) h_scaleW->Fill(iScale+0.5,(r->LHEScaleWeight)[iScale]);
+
+#endif
+
+#if defined(PDFSCALESYST)
+  if (m_iPdfStop < *(r->nLHEPdfWeight) && h_evt->Integral() < 10) std::cout << "\n WARNING: number of Pdf variations in the ntuple is higher than pre-defined. Only [" << m_iPdfStart << ", " << m_iPdfStop << ") pdf variations will be filled out of total " << *(r->nLHEPdfWeight) << " variations";
+  for(unsigned iPdf=0;iPdf < min((*(r->nLHEPdfWeight)-m_iPdfStart),(m_iPdfStop-m_iPdfStart));++iPdf) {
+    float pdfW = (r->LHEPdfWeight)[iPdf];
+    FillUnfolding_1(zee_rec_uf,zee_gen_uf,h_zee_unfolding_pdf[iPdf],w_zee_rec_uf*pdfW,genWeight*pdfW);
+    FillUnfolding_1(zmm_rec_uf,zmm_gen_uf,h_zmm_unfolding_pdf[iPdf],w_zmm_rec_uf*pdfW,genWeight*pdfW); 
+    FillUnfolding_1(zee_rec_afterMET_uf,zee_gen_uf,h_zee_afterMET_unfolding_pdf[iPdf],w_zee_rec_afterMET_uf*pdfW,genWeight*pdfW); 
+    FillUnfolding_1(zmm_rec_afterMET_uf,zmm_gen_uf,h_zmm_afterMET_unfolding_pdf[iPdf],w_zmm_rec_afterMET_uf*pdfW,genWeight*pdfW); 
+  }
+  if (m_nScale < *(r->nLHEScaleWeight) && h_evt->Integral() < 10) std::cout << "\n WARNING: number of scale variations in the ntuple is higher than pre-defined. Only " << m_nScale << " scale variations will be filled out of total " << *(r->nLHEScaleWeight) << " variations" ;
+  for(unsigned iScale=0;iScale < min(*(r->nLHEScaleWeight),m_nScale);++iScale) {
+    float scaleW = (r->LHEScaleWeight)[iScale];
+    FillUnfolding_1(zee_rec_uf,zee_gen_uf,h_zee_unfolding_scale[iScale],w_zee_rec_uf*scaleW,genWeight*scaleW);
+    FillUnfolding_1(zmm_rec_uf,zmm_gen_uf,h_zmm_unfolding_scale[iScale],w_zmm_rec_uf*scaleW,genWeight*scaleW); 
+    FillUnfolding_1(zee_rec_afterMET_uf,zee_gen_uf,h_zee_afterMET_unfolding_scale[iScale],w_zee_rec_afterMET_uf*scaleW,genWeight*scaleW); 
+    FillUnfolding_1(zmm_rec_afterMET_uf,zmm_gen_uf,h_zmm_afterMET_unfolding_scale[iScale],w_zmm_rec_afterMET_uf*scaleW,genWeight*scaleW); 
+  }
 #endif
 
   ////////////////////////////////////////

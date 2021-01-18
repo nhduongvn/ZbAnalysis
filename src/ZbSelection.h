@@ -61,9 +61,19 @@ private:
   UnfoldingPlots* h_zmm_unfolding;
   UnfoldingPlots* h_zee_afterMET_unfolding;
   UnfoldingPlots* h_zmm_afterMET_unfolding;
-  
 
+  std::vector<UnfoldingPlots*> h_zee_unfolding_pdf;
+  std::vector<UnfoldingPlots*> h_zmm_unfolding_pdf;
+  std::vector<UnfoldingPlots*> h_zee_afterMET_unfolding_pdf;
+  std::vector<UnfoldingPlots*> h_zmm_afterMET_unfolding_pdf;
+  std::vector<UnfoldingPlots*> h_zee_unfolding_scale;
+  std::vector<UnfoldingPlots*> h_zmm_unfolding_scale;
+  std::vector<UnfoldingPlots*> h_zee_afterMET_unfolding_scale;
+  std::vector<UnfoldingPlots*> h_zmm_afterMET_unfolding_scale;
+ 
   TH1D* h_evt ;
+  TH2D* h_pdfW;
+  TH2D* h_scaleW;
   TH1D* h_dR_je ;
   TH1D* h_dR_jm ;
   TH1D* h_nMuon ;

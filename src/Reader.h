@@ -81,6 +81,12 @@ public :
    TTreeReaderArray<Float_t> GenJet_pt = {fReader, "GenJet_pt"};
    TTreeReaderArray<UChar_t> GenJet_hadronFlavour = {fReader, "GenJet_hadronFlavour"};
 
+   TTreeReaderValue<Float_t> LHEWeight_originalXWGTUP = {fReader, "LHEWeight_originalXWGTUP"};
+   TTreeReaderValue<UInt_t> nLHEPdfWeight = {fReader, "nLHEPdfWeight"};
+   TTreeReaderArray<Float_t> LHEPdfWeight = {fReader, "LHEPdfWeight"};
+   TTreeReaderValue<UInt_t> nLHEScaleWeight = {fReader, "nLHEScaleWeight"};
+   TTreeReaderArray<Float_t> LHEScaleWeight = {fReader, "LHEScaleWeight"};
+
 #endif
 
    //reco SV

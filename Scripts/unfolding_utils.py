@@ -9,6 +9,27 @@ import ConfigParser
 import myutils.util_funcs as utl_func
 import myutils as utl 
 
+GENBINS = {}
+RECOBINS = {}
+GENBINS['pt_b1'] = array.array('d', [30,50,70,90,110,150,200]) 
+RECOBINS['pt_b1'] = array.array('d', [30,40,50,60,70,80,90,110,130,150,200])
+GENBINS['pt_b2'] =  array.array('d', [30,40,60,80,110,150,200]) 
+RECOBINS['pt_b2'] =  array.array('d', [30,40,50,60,80,90,110,130,150,200])
+GENBINS['pt_Z'] =  array.array('d', [0,10,20,40,60,80,100,150,200,300])
+RECOBINS['pt_Z'] =  array.array('d', [0,10,20,30,40,50,60,80,100,120,150,200,300])
+RECOBINS['dR_2b'] =  array.array('d', [0.4,0.8,1.2,1.6,2.0,2.4,2.8,3.0,3.4,4,4.5,5]) 
+GENBINS['dR_2b'] =  array.array('d', [0.4,1.2,2.0,2.4,3.0,3.4,4,4.5,5])
+RECOBINS['dPhi_2b'] =  array.array('d', [0.,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.25,2.5,2.75,ROOT.TMath.Pi()]) 
+GENBINS['dPhi_2b'] =  array.array('d', [0.,0.5,1.0,1.5,2.0,2.5,2.75,ROOT.TMath.Pi()])
+RECOBINS['dRmin_Z2b'] =  array.array('d', [0.,0.3,0.6,0.9,1.2,1.5,1.8,2.1,2.4,2.7,3,3.3,3.6,4,5])
+GENBINS['dRmin_Z2b'] =  array.array('d', [0.,0.6,1.2,1.8,2.4,2.7,3.0,3.3,4,5])
+RECOBINS['A_Z2b'] =  array.array('d', [0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.6,0.7,0.8,1])
+GENBINS['A_Z2b'] =  array.array('d', [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,1])
+RECOBINS['m_2b'] =  array.array('d', [20,50,75,100,125,150,175,200,225,250,275,300,350,400,500])
+GENBINS['m_2b'] =  array.array('d', [20,50,75,100,125,150,175,200,250,300,400,500])
+RECOBINS['m_Z2b'] =  array.array('d', [150,200,225,250,275,300,325,350,375,400,425,450,500,600])
+GENBINS['m_Z2b'] =  array.array('d', [150,200,250,300,350,400,450,500,600])
+
 
 def EmptyUFOF(h):
   hO = h.Clone(h.GetName()+"_emptyUFOF")
@@ -34,8 +55,8 @@ class Unfolder:
     self.hRes = hRes.Clone(hRes.GetName()+"_1")
     self.hGenAll = hGenAll.Clone(hGenAll.GetName()+"_1")
     self.hGenNotMatch = hGenNotMatch.Clone(hGenNotMatch.GetName()+"_1")
-    self.genbins = genbins
-    self.recobins = recobins
+    self.GENBINS[''] =  genbins
+    self.RECOBINS[''] =  recobins
   
   def CalEfficiency(self):
     self.hEff = self.hGenAll.Clone(self.hGenAll.GetName()+"_eff")
@@ -89,8 +110,8 @@ class Unfolder1:
     self.hRes = hRes.Clone(hRes.GetName()+"_1")
     self.hGenAll = hGenAll.Clone(hGenAll.GetName()+"_1")
     self.hGenMatch = hGenMatch.Clone(hGenMatch.GetName()+"_1")
-    self.genbins = genbins
-    self.recobins = recobins
+    self.genbins =  genbins
+    self.recobins =  recobins
   
   def CalEfficiency(self):
     self.hEff = self.hGenMatch.Clone(self.hGenMatch.GetName()+"_eff")
@@ -138,7 +159,7 @@ class Unfolder1:
     self.hUF.Divide(self.hEff)
 
 
-def Setup(cfg, runSyst = False, exclude_spliting_dy=True):
+def Setup(syst,cfg, runSyst = False, exclude_spliting_dy=True):
   
   fNames = {}
   xSecs = {}
@@ -155,7 +176,7 @@ def Setup(cfg, runSyst = False, exclude_spliting_dy=True):
     sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_MG','DY_Sherpa','TT','ST','WW','WZ','ZZ']
     #sNames = ['DY_0J','DY_1J','DY_2J']
   if runSyst:
-    sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','TT','ST','WW','WZ','ZZ']
+    sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_MG','TT','ST','WW','WZ','ZZ']
 
 
   for s in sNames: 
@@ -189,8 +210,26 @@ def Setup(cfg, runSyst = False, exclude_spliting_dy=True):
       for iN in names:
         if (s != 'DY_Sherpa') or (s == 'DY_Sherpa' and y == '16'): #only 16 available for Sherpa
           path = cfg.get('Paths','path_uf_Data') + '/' + iN
+          #FIXME
           if s not in ['Electron','Muon','ST','WW','WZ','ZZ']:
-            path = cfg.get('Paths','path_uf_MC') + '/' + iN
+            #each systematic is stored in different path
+            pathName = 'path_uf_MC'
+            if syst != 'NONE':
+              pathName = 'path_uf_MC_'+syst
+              if (('SCALE' in syst) or ('PDF' in syst)): 
+                #SCALE0-->SCALE
+                if 'SCALE' in syst: pathName = 'path_uf_MC_SCALE'
+                if 'PDF' in syst:
+                  iPDF = int(syst.split('PDF')[1])
+                  if iPDF in range(35): grName = 'G0'
+                  if iPDF in range(35,70): grName = 'G1'
+                  if iPDF in range(70,103): grName = 'G2'
+                  pathName = 'path_uf_MC_PDF' + grName
+                #incase of SCALE,PDF uncertainties, only DY are taken from scale uncertainty files, other will take central
+                if (s not in ['DY_0J','DY_1J','DY_2J','DY_MG']):
+                  pathName = 'path_uf_MC'
+
+            path = cfg.get('Paths',pathName) + '/' + iN
           #if s in ['ST','WW','WZ','ZZ']:
           #  path = cfg.get('Paths','path_uf_Data') + '/' + iN
           print s, path
@@ -229,6 +268,8 @@ def getHist(pN,samName,fH,lS,addYear=False): #samName = ['Electron'],['DY_0J','D
   for y in ['16','17','18']:
     if 'DY_Sherpa' in samName and y != '16': continue
   #for y in ['17']:
+    #print ">>>>here", samName[0], " ", y, " ", pN
+    #print fH
     hOut[y] = fH[samName[0]][y][0].Get(pN).Clone() #first sample, first file
     if samName[0] not in ['Electron','Muon']:
       hOut[y].Scale(lS[samName[0]][y][0])
@@ -323,6 +364,7 @@ def customBin2D(h, xDiv, yDiv):
       for j in range(1,h.GetNbinsX()+1):
         eXL1 = h.GetXaxis().GetBinLowEdge(j)
         eXH1 = eXL1 + h.GetXaxis().GetBinWidth(j)
+        if eXL1 < eXL or eXH1 > eXH: continue
         for jY in range(1,h.GetNbinsY()+1):
           eYL1 = h.GetYaxis().GetBinLowEdge(jY)
           eYH1 = eYL1 + h.GetYaxis().GetBinWidth(jY)
