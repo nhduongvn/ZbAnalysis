@@ -37,10 +37,14 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_zee_bjet = new ZbPlots("Zee_bjet") ;
   h_zee_bjet_afterMET = new ZbPlots("Zee_bjet_afterMET") ;
   h_zee_2bjet = new Z2bPlots("Zee_2bjet") ;
+  h_zee_2bjet_noMET = new Z2bPlots("Zee_2bjet_noMET") ;
 
   h_zee_2bjet_bb = new Z2bPlots("Zee_2bjet_bb") ; //two tagged bjets are bb
   h_zee_2bjet_bX = new Z2bPlots("Zee_2bjet_bX") ; //two tagged bjets are bb
   h_zee_2bjet_XX = new Z2bPlots("Zee_2bjet_XX") ; //two tagged bjets are bb
+  h_zee_2bjet_bb_noMET = new Z2bPlots("Zee_2bjet_bb_noMET") ; //two tagged bjets are bb
+  h_zee_2bjet_bX_noMET = new Z2bPlots("Zee_2bjet_bX_noMET") ; //two tagged bjets are bb
+  h_zee_2bjet_XX_noMET = new Z2bPlots("Zee_2bjet_XX_noMET") ; //two tagged bjets are bb
   h_zee_bjet_deepJet = new ZbPlots("Zee_bjetDeepJet") ;
   h_zee_2bjet_deepJet = new Z2bPlots("Zee_2bjetDeepJet") ;
   
@@ -51,11 +55,20 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_zmm_2bjet_bb = new Z2bPlots("Zmm_2bjet_bb") ; //two tagged bjets are bb
   h_zmm_2bjet_bX = new Z2bPlots("Zmm_2bjet_bX") ; //two tagged bjets are bb
   h_zmm_2bjet_XX = new Z2bPlots("Zmm_2bjet_XX") ; //two tagged bjets are bb
+  h_zmm_2bjet_noMET = new Z2bPlots("Zmm_2bjet_noMET") ;
+  h_zmm_2bjet_bb_noMET = new Z2bPlots("Zmm_2bjet_bb_noMET") ; //two tagged bjets are bb
+  h_zmm_2bjet_bX_noMET = new Z2bPlots("Zmm_2bjet_bX_noMET") ; //two tagged bjets are bb
+  h_zmm_2bjet_XX_noMET = new Z2bPlots("Zmm_2bjet_XX_noMET") ; //two tagged bjets are bb
+
   h_zmm_bjet_deepJet = new ZbPlots("Zmm_bjetDeepJet") ;
   h_zmm_2bjet_deepJet = new Z2bPlots("Zmm_2bjetDeepJet") ;
 
   h_emu_2bjet_eleTrig = new ElMu2bPlots("ElMu_2bjet_eleTrig");
   h_emu_2bjet_muTrig = new ElMu2bPlots("ElMu_2bjet_muTrig");
+  h_emu_2bjet_eleTrig_met80h = new ElMu2bPlots("ElMu_2bjet_eleTrig_met80h");
+  h_emu_2bjet_muTrig_met80h = new ElMu2bPlots("ElMu_2bjet_muTrig_met80h");
+  h_emu_2bjet_eleTrig_metCut = new ElMu2bPlots("ElMu_2bjet_eleTrig_metCut");
+  h_emu_2bjet_muTrig_metCut = new ElMu2bPlots("ElMu_2bjet_muTrig_metCut");
   
   unsigned nBins = 9 ;
   float bins[10] = {20, 30, 50, 70, 100, 140, 200, 300, 600, 1000} ;
@@ -154,6 +167,19 @@ void ZbSelection::SlaveBegin(Reader* r) {
 
   tmp = h_zee_2bjet_XX->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
+  tmp = h_zee_2bjet_noMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
+  tmp = h_zee_2bjet_bb_noMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  
+  tmp = h_zee_2bjet_bX_noMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
+  tmp = h_zee_2bjet_XX_noMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
   
   tmp = h_zmm_2bjet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
@@ -166,7 +192,20 @@ void ZbSelection::SlaveBegin(Reader* r) {
 
   tmp = h_zmm_2bjet_XX->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+ 
+  tmp = h_zmm_2bjet_noMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
+  tmp = h_zmm_2bjet_bb_noMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
+  tmp = h_zmm_2bjet_bX_noMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
+  tmp = h_zmm_2bjet_XX_noMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
+
   tmp = h_zee_bjet_deepJet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
@@ -183,7 +222,15 @@ void ZbSelection::SlaveBegin(Reader* r) {
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   tmp = h_emu_2bjet_muTrig->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
-  
+  tmp = h_emu_2bjet_eleTrig_metCut->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  tmp = h_emu_2bjet_muTrig_metCut->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  tmp = h_emu_2bjet_eleTrig_met80h->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  tmp = h_emu_2bjet_muTrig_met80h->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
   tmp = h_eff_b->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   tmp = h_eff_c->returnHisto() ;
@@ -285,6 +332,8 @@ void ZbSelection::Process(Reader* r) {
 #if defined(MC_2016) || defined(MC_2017)
   l1preW = *(r->L1PreFiringWeight_Nom);  
   //std::cout << "\nPrefiring: " << l1preW;
+  if (m_l1prefiringType == "l1prefiringu") l1preW = *(r->L1PreFiringWeight_Up);  
+  if (m_l1prefiringType == "l1prefiringd") l1preW = *(r->L1PreFiringWeight_Dn);  
 #endif
 
 #if defined(DATA_2016) || defined(DATA_2017) || defined(DATA_2018)
@@ -450,6 +499,23 @@ void ZbSelection::Process(Reader* r) {
   float btagT_cut = CUTS.Get<float>("jet_deepCSVT_"+m_year) ;
   float btagDeepJetM_cut = CUTS.Get<float>("jet_deepJetM_"+m_year) ;
 
+  float metPt = *(r->MET_pt);
+  float metPtSmeared = 0;
+
+#if defined(POSTPROC)
+  metPt = *(r->MET_T1_pt);
+#endif
+
+#if defined(POSTPROC) && (defined(MC_2016) || defined(MC_2017) || defined(MC_2018))
+  metPtSmeared = *(r->MET_T1Smear_pt);
+  if (m_jetmetSystType == "metjesu") metPt = *(r->MET_T1_pt_jesTotalUp); 
+  if (m_jetmetSystType == "metjesd") metPt = *(r->MET_T1_pt_jesTotalDown);
+  if (m_jetmetSystType == "metjeru") metPt = *(r->MET_T1_pt_jerUp);
+  if (m_jetmetSystType == "metjerd") metPt = *(r->MET_T1_pt_jerDown);
+  if (m_jetmetSystType == "metunclustu") metPt = *(r->MET_pt_unclustEnUp);
+  if (m_jetmetSystType == "metunclustd") metPt = *(r->MET_pt_unclustEnDown);
+#endif
+
   for (unsigned int i = 0 ; i < *(r->nJet) ; ++i) {
     
     h_Jet_cutflow->Fill(1) ;
@@ -461,8 +527,11 @@ void ZbSelection::Process(Reader* r) {
     
     float jetPt = (r->Jet_pt)[i];
 
-#if defined(JETMETSYST)
-    if (m_jetmetSystType == "jetnom" || m_jetmetSystType == "jetmetnom") jetPt = (r->Jet_pt_nom)[i];
+#if defined(POSTPROC)
+    jetPt = (r->Jet_pt_nom)[i];
+#endif
+    
+#if defined(POSTPROC) && (defined(MC_2016) || defined(MC_2017) || defined(MC_2018))
     if (m_jetmetSystType == "jesu") jetPt = (r->Jet_pt_jesTotalUp)[i];
     if (m_jetmetSystType == "jesd") jetPt = (r->Jet_pt_jesTotalDown)[i];
     if (m_jetmetSystType == "jeru") jetPt = (r->Jet_pt_jerUp)[i];
@@ -607,7 +676,8 @@ void ZbSelection::Process(Reader* r) {
           h_zee_cutflow->Fill(5) ; //pass jet cuts
 
           h_zee_jet->Fill(Z, jets[0], zee_w) ;
-          h_zee_jet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zee_w);
+
+          h_zee_jet->FillMet(metPt, *(r->PuppiMET_pt), zee_w, metPtSmeared);
         
           // isolation
           float deltaRelelep0 = Z.m_lep0.m_lvec.DeltaR(jets[0].m_lvec);
@@ -624,17 +694,17 @@ void ZbSelection::Process(Reader* r) {
         
         //at least one b-tagged jets
         h_zee_bjet->FillNjet(bjets.size(),evtW) ; 
-        if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zee_bjet_afterMET->FillNjet(bjets.size(),evtW);
+        if (metPt < CUTS.Get<float>("MET")) h_zee_bjet_afterMET->FillNjet(bjets.size(),evtW);
 
         if (bjets.size() >=1) {
            
           h_zee_cutflow->Fill(6) ;
 
           h_zee_bjet->Fill(Z, bjets[0], zeeb_w) ;
-          h_zee_bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
-          if (*(r->MET_pt) < CUTS.Get<float>("MET")) {
+          h_zee_bjet->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
+          if (metPt < CUTS.Get<float>("MET")) {
             h_zee_bjet_afterMET->Fill(Z, bjets[0], zeeb_w) ;
-            h_zee_bjet_afterMET->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+            h_zee_bjet_afterMET->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
           }
         }
 
@@ -643,27 +713,40 @@ void ZbSelection::Process(Reader* r) {
           
           h_zee_cutflow->Fill(7) ;
 
+          h_zee_2bjet_noMET->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
+          h_zee_2bjet_noMET->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
+
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
           //rec objects for unfolding before METCUT
           if (bjets[0].m_flav == 5 && bjets[1].m_flav == 5) {
+            h_zee_2bjet_bb_noMET->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
+            h_zee_2bjet_bb_noMET->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
             w_zee_rec_uf = zeeb_w;
             zee_rec_uf.push_back(eles[0].m_lvec);
             zee_rec_uf.push_back(eles[1].m_lvec);
             zee_rec_uf.push_back(bjets[0].m_lvec);
             zee_rec_uf.push_back(bjets[1].m_lvec);
           }
+          else if ((bjets[0].m_flav == 5 && bjets[1].m_flav != 5) || (bjets[0].m_flav != 5 && bjets[1].m_flav == 5)) {
+            h_zee_2bjet_bX_noMET->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
+            h_zee_2bjet_bX_noMET->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
+          }
+          else {
+            h_zee_2bjet_XX_noMET->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
+            h_zee_2bjet_XX_noMET->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
+          }
 #endif          
-          if (*(r->MET_pt) < CUTS.Get<float>("MET")) {
+          if (metPt < CUTS.Get<float>("MET")) {
             
             h_zee_cutflow->Fill(8) ;
 
             h_zee_2bjet->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
-            h_zee_2bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+            h_zee_2bjet->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
 
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
             if (bjets[0].m_flav == 5 && bjets[1].m_flav == 5) {
               h_zee_2bjet_bb->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
-              h_zee_2bjet_bb->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+              h_zee_2bjet_bb->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
               w_zee_rec_afterMET_uf = zeeb_w;
               zee_rec_afterMET_uf.push_back(eles[0].m_lvec);
               zee_rec_afterMET_uf.push_back(eles[1].m_lvec);
@@ -672,11 +755,11 @@ void ZbSelection::Process(Reader* r) {
             }
             else if ((bjets[0].m_flav == 5 && bjets[1].m_flav != 5) || (bjets[0].m_flav != 5 && bjets[1].m_flav == 5)) {
               h_zee_2bjet_bX->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
-              h_zee_2bjet_bX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+              h_zee_2bjet_bX->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
             }
             else {
               h_zee_2bjet_XX->Fill(Z, bjets[0], bjets[1], zeeb_w) ;
-              h_zee_2bjet_XX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
+              h_zee_2bjet_XX->FillMet(metPt, *(r->PuppiMET_pt), zeeb_w, metPtSmeared);
             }
 #endif
           } //end MET cut
@@ -689,7 +772,7 @@ void ZbSelection::Process(Reader* r) {
           h_zee_cutflow->Fill(8) ;
 
           h_zee_bjet_deepJet->Fill(Z, bjets_deepJet[0], evtW) ; //FIXME
-          h_zee_bjet_deepJet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW); //FIXME
+          h_zee_bjet_deepJet->FillMet(metPt, *(r->PuppiMET_pt), evtW, metPtSmeared); //FIXME
         } //end one b-tagged jets using deepJet
 
         //at least two b-tagged jets using deepJet
@@ -698,7 +781,7 @@ void ZbSelection::Process(Reader* r) {
           h_zee_cutflow->Fill(9) ;
 
           h_zee_2bjet_deepJet->Fill(Z, bjets_deepJet[0], bjets_deepJet[1], evtW) ; //FIXME
-          h_zee_2bjet_deepJet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW); //FIXME
+          h_zee_2bjet_deepJet->FillMet(metPt, *(r->PuppiMET_pt), evtW, metPtSmeared); //FIXME
         } //end at least two b-tagged jets using deepJet
 
       }//end Z mass
@@ -751,7 +834,7 @@ void ZbSelection::Process(Reader* r) {
           float deltaRmuonlep1 = Z.m_lep1.m_lvec.DeltaR(jets[0].m_lvec);
         
           h_zmm_jet->Fill(Z, jets[0], zmm_w) ;
-          h_zmm_jet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmm_w);
+          h_zmm_jet->FillMet(metPt, *(r->PuppiMET_pt), zmm_w, metPtSmeared);
 
           h_dR_jm->Fill(std::min(deltaRmuonlep0,deltaRmuonlep1), zmm_w) ;
  
@@ -765,18 +848,18 @@ void ZbSelection::Process(Reader* r) {
         //Zmm+bjets
         h_zmm_bjet->FillNjet(bjets.size(),zmmb_w) ; 
 
-        if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zmm_bjet_afterMET->FillNjet(bjets.size(),zmmb_w) ; 
+        if (metPt < CUTS.Get<float>("MET")) h_zmm_bjet_afterMET->FillNjet(bjets.size(),zmmb_w) ; 
 
         if (bjets.size() >= 1) {
           
           h_zmm_cutflow->Fill(6) ;
           
           h_zmm_bjet->Fill(Z, bjets[0], zmmb_w) ; 
-          h_zmm_bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+          h_zmm_bjet->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
           
-          if (*(r->MET_pt) < CUTS.Get<float>("MET")) {
+          if (metPt < CUTS.Get<float>("MET")) {
             h_zmm_bjet_afterMET->Fill(Z, bjets[0], zmmb_w) ; 
-            h_zmm_bjet_afterMET->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+            h_zmm_bjet_afterMET->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
           }
 
         }
@@ -785,29 +868,41 @@ void ZbSelection::Process(Reader* r) {
         if (bjets.size() >= 2) {
           
           h_zmm_cutflow->Fill(7) ;
-      
+          h_zmm_2bjet_noMET->Fill(Z, bjets[0], bjets[1], zmmb_w) ; 
+          h_zmm_2bjet_noMET->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
+
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
           //Unfolding plots
           if (bjets[0].m_flav == 5 && bjets[1].m_flav == 5) {
+            h_zmm_2bjet_bb_noMET->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
+            h_zmm_2bjet_bb_noMET->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
             w_zmm_rec_uf = zmmb_w;
             zmm_rec_uf.push_back(muons[0].m_lvec);
             zmm_rec_uf.push_back(muons[1].m_lvec);
             zmm_rec_uf.push_back(bjets[0].m_lvec);
             zmm_rec_uf.push_back(bjets[1].m_lvec);
           }
+          else if ((bjets[0].m_flav == 5 && bjets[1].m_flav != 5) || (bjets[0].m_flav != 5 && bjets[1].m_flav == 5)) {
+              h_zmm_2bjet_bX_noMET->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
+              h_zmm_2bjet_bX_noMET->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
+          }
+          else {
+              h_zmm_2bjet_XX_noMET->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
+              h_zmm_2bjet_XX_noMET->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
+          }
 #endif
 
-          if (*(r->MET_pt) < CUTS.Get<float>("MET")) {
+          if (metPt < CUTS.Get<float>("MET")) {
             
             h_zmm_cutflow->Fill(8) ;
             
             h_zmm_2bjet->Fill(Z, bjets[0], bjets[1], zmmb_w) ; 
-            h_zmm_2bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+            h_zmm_2bjet->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
 
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
             if (bjets[0].m_flav == 5 && bjets[1].m_flav == 5) {
               h_zmm_2bjet_bb->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
-              h_zmm_2bjet_bb->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+              h_zmm_2bjet_bb->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
               w_zmm_rec_afterMET_uf = zmmb_w;
               zmm_rec_afterMET_uf.push_back(muons[0].m_lvec);
               zmm_rec_afterMET_uf.push_back(muons[1].m_lvec);
@@ -816,11 +911,11 @@ void ZbSelection::Process(Reader* r) {
             }
             else if ((bjets[0].m_flav == 5 && bjets[1].m_flav != 5) || (bjets[0].m_flav != 5 && bjets[1].m_flav == 5)) {
               h_zmm_2bjet_bX->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
-              h_zmm_2bjet_bX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+              h_zmm_2bjet_bX->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
             }
             else {
               h_zmm_2bjet_XX->Fill(Z, bjets[0], bjets[1], zmmb_w) ;
-              h_zmm_2bjet_XX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
+              h_zmm_2bjet_XX->FillMet(metPt, *(r->PuppiMET_pt), zmmb_w, metPtSmeared);
             }
 
 #endif
@@ -834,7 +929,7 @@ void ZbSelection::Process(Reader* r) {
           h_zmm_cutflow->Fill(8) ;
 
           h_zmm_bjet_deepJet->Fill(Z, bjets_deepJet[0], evtW) ; //FIXME
-          h_zmm_bjet_deepJet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW); //FIXME
+          h_zmm_bjet_deepJet->FillMet(metPt, *(r->PuppiMET_pt), evtW, metPtSmeared); //FIXME
         }
 
         //at least two b-tagged jets using deepJet
@@ -843,7 +938,7 @@ void ZbSelection::Process(Reader* r) {
           h_zmm_cutflow->Fill(9) ;
 
           h_zmm_2bjet_deepJet->Fill(Z, bjets_deepJet[0], bjets_deepJet[1], evtW) ; //FIXME
-          h_zmm_2bjet_deepJet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW); //FIXME
+          h_zmm_2bjet_deepJet->FillMet(metPt, *(r->PuppiMET_pt), evtW, metPtSmeared); //FIXME
         }
 
       } //end Z mass cut
@@ -867,13 +962,13 @@ void ZbSelection::Process(Reader* r) {
   FillUnfolding_1(zmm_rec_uf,zmm_gen_uf,h_zmm_unfolding,w_zmm_rec_uf,genWeight); 
   FillUnfolding_1(zee_rec_afterMET_uf,zee_gen_uf,h_zee_afterMET_unfolding,w_zee_rec_afterMET_uf,genWeight); 
   FillUnfolding_1(zmm_rec_afterMET_uf,zmm_gen_uf,h_zmm_afterMET_unfolding,w_zmm_rec_afterMET_uf,genWeight); 
-  //std::cout << "\n " << genWeight << " " << *(r->LHEWeight_originalXWGTUP) << " " << *(r->nLHEPdfWeight) << " " << *(r->nLHEScaleWeight) << " " << (r->LHEPdfWeight)[0] << " " << (r->LHEPdfWeight)[1] << " " << (r->LHEScaleWeight)[0];
-  for(unsigned iPdf=0;iPdf < *(r->nLHEPdfWeight);++iPdf) h_pdfW->Fill(iPdf+0.5,(r->LHEPdfWeight)[iPdf]);
-  for(unsigned iScale=0;iScale < *(r->nLHEScaleWeight);++iScale) h_scaleW->Fill(iScale+0.5,(r->LHEScaleWeight)[iScale]);
 
 #endif
 
 #if defined(PDFSCALESYST)
+  //std::cout << "\n " << genWeight << " " << *(r->LHEWeight_originalXWGTUP) << " " << *(r->nLHEPdfWeight) << " " << *(r->nLHEScaleWeight) << " " << (r->LHEPdfWeight)[0] << " " << (r->LHEPdfWeight)[1] << " " << (r->LHEScaleWeight)[0];
+  for(unsigned iPdf=0;iPdf < *(r->nLHEPdfWeight);++iPdf) h_pdfW->Fill(iPdf+0.5,(r->LHEPdfWeight)[iPdf]);
+  for(unsigned iScale=0;iScale < *(r->nLHEScaleWeight);++iScale) h_scaleW->Fill(iScale+0.5,(r->LHEScaleWeight)[iScale]);
   if (m_iPdfStop < *(r->nLHEPdfWeight) && h_evt->Integral() < 10) std::cout << "\n WARNING: number of Pdf variations in the ntuple is higher than pre-defined. Only [" << m_iPdfStart << ", " << m_iPdfStop << ") pdf variations will be filled out of total " << *(r->nLHEPdfWeight) << " variations";
   for(unsigned iPdf=0;iPdf < min((*(r->nLHEPdfWeight)-m_iPdfStart),(m_iPdfStop-m_iPdfStart));++iPdf) {
     float pdfW = (r->LHEPdfWeight)[iPdf];
@@ -901,10 +996,16 @@ void ZbSelection::Process(Reader* r) {
   // make sure we have at least one of each lepton
   if (eles.size() >= 1 && muons.size() >= 1)
   {
-    float eleSF_w_tmp = CalSingleEleSF(eles[0]);
-    float muonSF_w_tmp = CalSingleMuonSF_id_iso(muons[0]);
-    float trigSF_ele_tmp = CalTrigSF_singleLepton(11, eles[0], trigObj_ele);
-    float trigSF_mu_tmp = CalTrigSF_singleLepton(13, muons[0], trigObj_muon);
+    float eleSF_w_tmp = 1;
+    float muonSF_w_tmp = 1;
+    float trigSF_ele_tmp = 1;
+    float trigSF_mu_tmp = 1;
+    if (!m_isData) {
+      eleSF_w_tmp=CalSingleEleSF(eles[0]);
+      muonSF_w_tmp=CalSingleMuonSF_id_iso(muons[0]);
+      trigSF_ele_tmp=CalTrigSF_singleLepton(11, eles[0], trigObj_ele);
+      trigSF_mu_tmp=CalTrigSF_singleLepton(13, muons[0], trigObj_muon);
+    }
     float zem_noTrig_w = evtW*eleSF_w_tmp*muonSF_w_tmp;
     // make sure the masses meet our cuts
     if ((eles[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0") && muons[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt1")) ||
@@ -912,9 +1013,15 @@ void ZbSelection::Process(Reader* r) {
     {
       if (bjets.size() >= 2)
       {
-        if (*(r->MET_pt) > 80.0) {
-          if (eleTrig) h_emu_2bjet_eleTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],*(r->MET_pt),zem_noTrig_w*trigSF_ele_tmp);
-          if (muonTrig) h_emu_2bjet_muTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],*(r->MET_pt),zem_noTrig_w*trigSF_mu_tmp);
+        h_emu_2bjet_eleTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_ele_tmp,metPtSmeared);
+        h_emu_2bjet_muTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
+        if (metPt > 80.0) {
+          if (eleTrig) h_emu_2bjet_eleTrig_met80h->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_ele_tmp,metPtSmeared);
+          if (muonTrig) h_emu_2bjet_muTrig_met80h->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
+        }
+        if (metPt < CUTS.Get<float>("MET")) {
+          if (eleTrig) h_emu_2bjet_eleTrig_metCut->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_ele_tmp,metPtSmeared);
+          if (muonTrig) h_emu_2bjet_muTrig_metCut->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
         }
       }
       

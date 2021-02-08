@@ -304,10 +304,8 @@ int main(int argc, char *argv[]) {
 #if defined(DATA_2016) || defined(DATA_2017) || defined(DATA_2018)
   sel.SetLumiMaskFilter(fName_lumiMaskFilter);
 #endif
-
-  if (syst == "JETNOM") sel.SetJetMetSyst("jetnom");
-  if (syst == "METNOM") sel.SetJetMetSyst("metnom");
-  if (syst == "JETMETNOM") sel.SetJetMetSyst("jetmetnom");
+  if (syst == "L1PREFIRINGU") sel.SetL1prefiring("l1prefiringu");
+  if (syst == "L1PREFIRINGD") sel.SetL1prefiring("l1prefiringd");
   if (syst == "JESU") sel.SetJetMetSyst("jesu");
   if (syst == "JESD") sel.SetJetMetSyst("jesd");
   if (syst == "JERU") sel.SetJetMetSyst("jeru");
@@ -316,6 +314,14 @@ int main(int argc, char *argv[]) {
   if (syst == "METJESD") sel.SetJetMetSyst("metjesd");
   if (syst == "METJERU") sel.SetJetMetSyst("metjeru");
   if (syst == "METJERD") sel.SetJetMetSyst("metjerd");
+  if (syst == "METUNCLUSTU") sel.SetJetMetSyst("metunclustu");
+  if (syst == "METUNCLUSTD") sel.SetJetMetSyst("metunclustd");
+
+  if (syst == "SCALE") sel.SetPdfScaleSyst("scale");
+  //split pdf members to group: 0=0,34; 1=35-69; 2=70-Max; Max = 103
+  if (syst == "PDFG0") sel.SetPdfScaleSyst("pdfg0");
+  if (syst == "PDFG1") sel.SetPdfScaleSyst("pdfg1");
+  if (syst == "PDFG2") sel.SetPdfScaleSyst("pdfg2");
 
   sels.push_back(&sel) ;
   

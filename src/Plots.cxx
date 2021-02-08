@@ -112,6 +112,8 @@ class ZbPlots
 
       h_met = new TH1D(name + "_met","",500,0,500);
       h_met->Sumw2();
+      h_met_smeared = new TH1D(name + "_met_smeared","",500,0,500);
+      h_met_smeared->Sumw2();
       h_met_puppi = new TH1D(name + "_met_puppi","",500,0,500);
       h_met_puppi->Sumw2();
 
@@ -156,8 +158,9 @@ class ZbPlots
       h_Njet->Fill(nJet,w) ;
     } ;
 
-    void FillMet(float met, float met_puppi, float w) { 
+    void FillMet(float met, float met_puppi, float w, float met_smeared) { 
       h_met->Fill(met,w);
+      h_met_smeared->Fill(met_smeared,w);
       h_met_puppi->Fill(met_puppi,w);
     };
     
@@ -192,6 +195,7 @@ class ZbPlots
       histolist.push_back(h_phi_dilepton) ;
       histolist.push_back(h_eta_dilepton) ;
       histolist.push_back(h_met);
+      histolist.push_back(h_met_smeared);
       histolist.push_back(h_met_puppi);
       
       return histolist ; 
@@ -227,6 +231,7 @@ class ZbPlots
     TH1D* h_eta_dilepton ;
     TH1D* h_mSV_jet;
     TH1D* h_met;
+    TH1D* h_met_smeared;
     TH1D* h_met_puppi;
 } ;
 
@@ -296,10 +301,11 @@ class Z2bPlots : public ZbPlots{
       h_A_Z2b->Fill(A_Z2b, w) ;
     } ;
 
-    void FillMet(float met, float met_puppi, float w) { 
-      h_met->Fill(met,w);
-      h_met_puppi->Fill(met_puppi,w);
-    };
+    //void FillMet(float met, float met_puppi, float w, float met_smeared=0) { 
+    //  h_met->Fill(met,w);
+    //  h_met_puppi->Fill(met_puppi,w);
+    //  h_met_smeared->Fill(met_smeared,w);
+    //};
 
     std::vector<TH1*> returnHisto(){
       std::vector<TH1*> histolist = ZbPlots::returnHisto() ;
@@ -364,6 +370,7 @@ class ElMu2bPlots {
       h_eta_jet1 = new TH1D(name + "_eta_jet1","",NBIN_ETA,X_ETA[0],X_ETA[1]) ;
       
       h_met = new TH1D(name + "_met","",500,0,500);
+      h_met_smeared = new TH1D(name + "_met_smeared","",500,0,500);
       
       h_pt_ele->Sumw2();
       h_phi_ele->Sumw2();
@@ -379,9 +386,10 @@ class ElMu2bPlots {
       h_phi_jet1->Sumw2() ;
       h_eta_jet1->Sumw2() ;
       h_met->Sumw2();
+      h_met_smeared->Sumw2();
     } ;
 
-    void Fill(LepObj& ele, LepObj& muon, JetObj& J, JetObj& J1, float met, float w=1) {
+    void Fill(LepObj& ele, LepObj& muon, JetObj& J, JetObj& J1, float met, float w, float met_smeared) {
       h_pt_ele->Fill(ele.m_lvec.Pt(), w) ;
       h_eta_ele->Fill(ele.m_lvec.Eta(), w) ;
       h_phi_ele->Fill(ele.m_lvec.Phi(), w) ;
@@ -396,6 +404,7 @@ class ElMu2bPlots {
       h_eta_jet1->Fill(J1.m_lvec.Eta(), w) ;
       h_phi_jet1->Fill(J1.m_lvec.Phi(), w) ;
       h_met->Fill(met,w);
+      h_met_smeared->Fill(met_smeared,w);
     } ;
 
     std::vector<TH1*> returnHisto(){
@@ -414,6 +423,7 @@ class ElMu2bPlots {
       histolist.push_back(h_phi_jet1) ;
       histolist.push_back(h_eta_jet1) ;
       histolist.push_back(h_met) ;
+      histolist.push_back(h_met_smeared) ;
 
       return histolist ;
     }
@@ -433,6 +443,7 @@ class ElMu2bPlots {
     TH1D* h_phi_jet1 ;
     TH1D* h_eta_jet1 ;
     TH1D* h_met;
+    TH1D* h_met_smeared;
 } ;
 
 class EffPlots

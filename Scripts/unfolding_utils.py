@@ -159,7 +159,8 @@ class Unfolder1:
     self.hUF.Divide(self.hEff)
 
 
-def Setup(syst,cfg, runSyst = False, exclude_spliting_dy=True):
+#when running on PUU, PUD ... JESU, JESD use incomplete samples for NONE since those uncertainties run on incomplete samples
+def Setup(syst,cfg, use_incomplete_sample=False, exclude_spliting_dy=True):
   
   fNames = {}
   xSecs = {}
@@ -169,14 +170,15 @@ def Setup(syst,cfg, runSyst = False, exclude_spliting_dy=True):
   #sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_0J_p1','DY_1J_p1','DY_2J_p1','DY_0J_p2','DY_1J_p2','DY_2J_p2','DY_MG','TT','ST','WW','WZ','ZZ']
   #sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_0J_p1','DY_1J_p1','DY_2J_p1','DY_0J_p2','DY_1J_p2','DY_2J_p2','DY_MG','DY_Sherpa','TT','ST','WW','WZ','ZZ']
   #for syst
-  sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_0J_p1','DY_1J_p1','DY_2J_p1','DY_0J_p2','DY_1J_p2','DY_2J_p2','DY_MG','DY_Sherpa','TT','ST','WW','WZ','ZZ']
+  #sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_0J_p1','DY_1J_p1','DY_2J_p1','DY_0J_p2','DY_1J_p2','DY_2J_p2','DY_MG','DY_Sherpa','TT','ST','WW','WZ','ZZ']
+  sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_0J_p1','DY_1J_p1','DY_2J_p1','DY_0J_p2','DY_1J_p2','DY_2J_p2','TT','ST','WW','WZ','ZZ']
   #sNames = ['DY_0J','DY_1J','DY_2J']
   if exclude_spliting_dy:
-    #sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_MG','TT','ST','WW','WZ','ZZ']
-    sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_MG','DY_Sherpa','TT','ST','WW','WZ','ZZ']
+    #sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_MG','DY_Sherpa','TT','ST','WW','WZ','ZZ']
+    sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','TT','ST','WW','WZ','ZZ']
     #sNames = ['DY_0J','DY_1J','DY_2J']
-  if runSyst:
-    sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','DY_MG','TT','ST','WW','WZ','ZZ']
+  #if runSyst:
+  #  sNames = ['Electron','Muon','DY_0J','DY_1J','DY_2J','TT','ST','WW','WZ','ZZ']
 
 
   for s in sNames: 
@@ -211,11 +213,15 @@ def Setup(syst,cfg, runSyst = False, exclude_spliting_dy=True):
         if (s != 'DY_Sherpa') or (s == 'DY_Sherpa' and y == '16'): #only 16 available for Sherpa
           path = cfg.get('Paths','path_uf_Data') + '/' + iN
           #FIXME
-          if s not in ['Electron','Muon','ST','WW','WZ','ZZ']:
-            #each systematic is stored in different path
+          if s not in ['Electron','Muon']:
             pathName = 'path_uf_MC'
+            if use_incomplete_sample:
+              pathName = 'path_uf_MC_1'
+            #each systematic is stored in different path
             if syst != 'NONE':
               pathName = 'path_uf_MC_'+syst
+              if use_incomplete_sample:
+                pathName = 'path_uf_MC_'+syst+'_1'
               if (('SCALE' in syst) or ('PDF' in syst)): 
                 #SCALE0-->SCALE
                 if 'SCALE' in syst: pathName = 'path_uf_MC_SCALE'

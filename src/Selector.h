@@ -53,6 +53,7 @@ class Selector
   virtual float MuonRcSF(Reader* r, LepObj lep, int pdgId) ;
 
   virtual void SetJetMetSyst(std::string jetmetsystType) {m_jetmetSystType = jetmetsystType;};
+  virtual void SetL1prefiring(std::string l1prefiringType) {m_l1prefiringType = l1prefiringType;};
   virtual void SetPdfScaleSyst(std::string pdfScaleSystType) {
     m_nScale = 0;
     if (pdfScaleSystType=="scale") m_nScale=9;
@@ -92,6 +93,7 @@ class Selector
   std::string m_eleUncType;
   std::string m_muonUncType;
   std::string m_jetmetSystType;
+  std::string m_l1prefiringType;
 
   unsigned m_nScale;
   unsigned m_iPdfStart;

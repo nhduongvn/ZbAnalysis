@@ -5,7 +5,11 @@ ROOTCFLAGS   	:= $(shell root-config --cflags)
 ROOTLIBS     	:= $(shell root-config --libs)
 ROOTGLIBS    	:= $(shell root-config --glibs)
 
-CXXFLAGS	= -O -Wall -fPIC -D $(FORMAT) -D $(INPUT) -D $(SYST)
+#FORMAT: MC_2016, MC_2017, MC_2018, DATA_2016, DATA_2017, DATA_2018
+#FORMAT1: POSTPROC, NORMAL 
+#INPUT: TFILE, TCHAIN
+#PDFSCALESYST: PDFSCALESYST,NONE 
+CXXFLAGS	= -O -Wall -fPIC -D $(FORMAT) -D $(FORMATPROCESSING) -D $(INPUT) -D $(PDFSCALESYST)
 CXXFLAGS	+= $(ROOTCFLAGS)	
 
 SOFLAGS		= -O -shared
@@ -69,4 +73,4 @@ Processor_dict.o: Processor_dict.cxx
 #	$(CXX) $(CXXFLAGS) -I yaml-cpp/include -lyaml-cpp -c $^ -o $@
 
 clean:
-	rm -rf *.o *.so *_dict.cxx
+	rm -rf main *.o *.so *_dict.cxx

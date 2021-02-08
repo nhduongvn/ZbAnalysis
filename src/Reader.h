@@ -80,13 +80,15 @@ public :
    TTreeReaderArray<Float_t> GenJet_phi = {fReader, "GenJet_phi"};
    TTreeReaderArray<Float_t> GenJet_pt = {fReader, "GenJet_pt"};
    TTreeReaderArray<UChar_t> GenJet_hadronFlavour = {fReader, "GenJet_hadronFlavour"};
+#endif
 
+//PDFSCALESYST is defined only when runing on MC so no need to defined MC
+#if defined(PDFSCALESYST)
    TTreeReaderValue<Float_t> LHEWeight_originalXWGTUP = {fReader, "LHEWeight_originalXWGTUP"};
    TTreeReaderValue<UInt_t> nLHEPdfWeight = {fReader, "nLHEPdfWeight"};
    TTreeReaderArray<Float_t> LHEPdfWeight = {fReader, "LHEPdfWeight"};
    TTreeReaderValue<UInt_t> nLHEScaleWeight = {fReader, "nLHEScaleWeight"};
    TTreeReaderArray<Float_t> LHEScaleWeight = {fReader, "LHEScaleWeight"};
-
 #endif
 
    //reco SV
@@ -144,19 +146,27 @@ public :
    TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader, "Jet_hadronFlavour"};
 #endif
 
-#if defined(JETMETSYST)
+#if defined(POSTPROC)
    TTreeReaderArray<Float_t> Jet_pt_nom = {fReader, "Jet_pt_nom"};
+   TTreeReaderValue<Float_t> MET_T1_pt = {fReader, "MET_T1_pt"};
+#endif
+
+#if defined(POSTPROC) && (defined(MC_2016) || defined(MC_2017) || defined(MC_2018))
    TTreeReaderArray<Float_t> Jet_pt_jesTotalUp = {fReader, "Jet_pt_jesTotalUp"};
    TTreeReaderArray<Float_t> Jet_pt_jesTotalDown = {fReader, "Jet_pt_jesTotalDown"};
    TTreeReaderArray<Float_t> Jet_pt_jerUp = {fReader, "Jet_pt_jerUp"};
    TTreeReaderArray<Float_t> Jet_pt_jerDown = {fReader, "Jet_pt_jerDown"};
-   TTreeReaderValue<Float_t> MET_T1_pt = {fReader, "MET_T1_pt"};
    TTreeReaderValue<Float_t> MET_T1_pt_jerUp = {fReader, "MET_T1_pt_jerUp"};
    TTreeReaderValue<Float_t> MET_T1_pt_jerDown = {fReader, "MET_T1_pt_jerDown"};
    TTreeReaderValue<Float_t> MET_T1_pt_jesTotalUp = {fReader, "MET_T1_pt_jesTotalUp"};
    TTreeReaderValue<Float_t> MET_T1_pt_jesTotalDown = {fReader, "MET_T1_pt_jesTotalDown"};
    TTreeReaderValue<Float_t> MET_pt_unclustEnDown = {fReader, "MET_pt_unclustEnDown"};
    TTreeReaderValue<Float_t> MET_pt_unclustEnUp = {fReader, "MET_pt_unclustEnUp"};
+   TTreeReaderValue<Float_t> MET_T1Smear_pt = {fReader, "MET_T1Smear_pt"};
+   TTreeReaderValue<Float_t> MET_T1Smear_pt_jerUp = {fReader, "MET_T1Smear_pt_jerUp"};
+   TTreeReaderValue<Float_t> MET_T1Smear_pt_jerDown = {fReader, "MET_T1Smear_pt_jerDown"};
+   TTreeReaderValue<Float_t> MET_T1Smear_pt_jesTotalUp = {fReader, "MET_T1Smear_pt_jesTotalUp"};
+   TTreeReaderValue<Float_t> MET_T1Smear_pt_jesTotalDown = {fReader, "MET_T1Smear_pt_jesTotalDown"};
 #endif
 
    Reader(TTree * /*tree*/ =0) {}

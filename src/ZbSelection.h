@@ -36,10 +36,19 @@ private:
   Z2bPlots* h_zee_2bjet_bb ;
   Z2bPlots* h_zee_2bjet_bX ;
   Z2bPlots* h_zee_2bjet_XX ;
+  Z2bPlots* h_zee_2bjet_noMET ;
+  Z2bPlots* h_zee_2bjet_bb_noMET ;
+  Z2bPlots* h_zee_2bjet_bX_noMET ;
+  Z2bPlots* h_zee_2bjet_XX_noMET ;
+
   Z2bPlots* h_zmm_2bjet ;
   Z2bPlots* h_zmm_2bjet_bb ;
   Z2bPlots* h_zmm_2bjet_bX ;
   Z2bPlots* h_zmm_2bjet_XX ;
+  Z2bPlots* h_zmm_2bjet_noMET ;
+  Z2bPlots* h_zmm_2bjet_bb_noMET ;
+  Z2bPlots* h_zmm_2bjet_bX_noMET ;
+  Z2bPlots* h_zmm_2bjet_XX_noMET ;
 
   ZbPlots* h_zee_bjet_deepJet ;
   ZbPlots* h_zmm_bjet_deepJet ;
@@ -48,6 +57,10 @@ private:
 
   ElMu2bPlots* h_emu_2bjet_eleTrig;
   ElMu2bPlots* h_emu_2bjet_muTrig;
+  ElMu2bPlots* h_emu_2bjet_eleTrig_met80h;
+  ElMu2bPlots* h_emu_2bjet_muTrig_met80h;
+  ElMu2bPlots* h_emu_2bjet_eleTrig_metCut;
+  ElMu2bPlots* h_emu_2bjet_muTrig_metCut;
  
   EffPlots* h_eff_b ;
   EffPlots* h_eff_c ;

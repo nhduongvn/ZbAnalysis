@@ -2,7 +2,7 @@ import os,sys
 import json
 import time
 
-def write_condor_config(workDir, sample_format, data_name, name_output_dir, nJob, syst='none', compilewithsyst='OTHER', debug = False):
+def write_condor_config(workDir,sample_format,sample_format_processing, data_name, name_output_dir, nJob, syst='none', compile_with_pdfscalesyst='NONE', debug = False):
   exe_fileName = 'exe_' + data_name + '.sh'
   if syst != 'none':
     exe_fileName = 'exe_' + syst + '_' + data_name + '.sh'
@@ -37,7 +37,7 @@ def write_condor_config(workDir, sample_format, data_name, name_output_dir, nJob
   f.write('cd ${_CONDOR_SCRATCH_DIR} \n')
   f.write('tar -xvf input.tar \n')
 #  f.write('make clean \n')
-  f.write('make FORMAT='+sample_format+' INPUT=TCHAIN'+' SYST='+compilewithsyst+'\n')
+  f.write('make FORMAT='+sample_format+' FORMATPROCESSING='+sample_format_processing+' INPUT=TCHAIN'+' PDFSCALESYST='+compile_with_pdfscalesyst+'\n')
 
   sampleType = '0'
   if 'DATA' in sample_format:
@@ -75,34 +75,42 @@ def make_input_file_list(nFile, outDir_file_list, file_list_name):
 
 #///////////////////////////////////////////////////////////////////
 runMode = 1 #0: submit, 1: check output and hadd output file
-submit = True # for testing or executing submission 
+submit = True# for testing or executing submission 
 
-syst = 'SCALE' #NONE,PUU,PUD,BTAGU,BTAGD,ELEU,ELED,MUONU,MUOND,JETNOM,JESU,JESD,JERU,JERD,PDFG0,PDFG1,PDFG2,SCALE
-compilewithsyst = 'PDFSCALESYST' #OTHER,PDFSCALESYST,JETMETSYST
+sample_format_processing = 'NORMAL' #NORMAL,PPOSTPROC
+syst = 'PDFG2' #NONE,PUU,PUD,BTAGU,BTAGD,ELEU,ELED,MUONU,MUOND,L1PREFIRINGU,L1PREFIRINGD,JESU,JESD,JERU,JERD,METJESU,METJESD,METJERU,METJERD,METUNCLUSTU,METUNCLUSTD,PDFG0,PDFG1,PDFG2,SCALE
+if len(sys.argv) > 1:
+  syst = sys.argv[1]
+
+compile_with_pdfscalesyst = 'PDFSCALESYST' #NONE,PDFSCALESYST
+#compile_with_pdfscalesyst = 'PDFSCALESYST' #NONE,PDFSCALESYST, choose PDFSCALESYST only when runs on MC
 
 debug = False 
 
 sourceDir = '/uscms_data/d3/duong/ZplusB_working/Ana/' #directory for source code + file lists
-condorRunDir = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/' #directory to contain files to run jobs
+condorRunDir = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB_pdfScale/' #directory to contain files to run jobs
 
-dataSet_list = sourceDir+"/datasets_Nano02Apr2020_json.txt"
+#dataSet_list = sourceDir+"/datasets_Nano02Apr2020_json_postProc_MC.txt"
+#dataSet_list = sourceDir+"/datasets_Nano02Apr2020_json_postProc.txt"
 #dataSet_list = sourceDir+"/datasets_Nano02Apr2020_json_jetmet_syst.txt"
-dataSet_list = sourceDir+"/datasets_Nano02Apr2020_DY_mg_sherpa_json.txt"
+#dataSet_list = sourceDir+"/datasets_Nano02Apr2020_DY_mg_sherpa_json.txt"
+#dataSet_list = sourceDir+"/datasets_Nano02Apr2020_pdfScale.txt"
+dataSet_list = sourceDir+"/datasets_Nano02Apr2020_json_syst.txt"
 
-nFile = 4
+nFile = 2
 
 
-#dir_file_list = sourceDir+'/FileLists_Nano02Apr2020_postproc/'
+#dir_file_list = sourceDir+'/FileLists_Nano02Apr2020_postproc_secondRound_removeBadFiles/'
 dir_file_list = sourceDir+'/FileLists_Nano02Apr2020/'
 
-outputDir_eos = '/store/user/duong/Output_ZplusB/'
-if syst != 'NONE':
-  outputDir_eos = '/store/user/duong/Output_ZplusB/'+syst+'/'
+#outputDir_eos = '/store/user/duong/Output_ZplusB_postProc/'
+#if syst != 'NONE':
+outputDir_eos = '/store/user/duong/Output_ZplusB_pdfScale/'+syst+'/'
 
 #outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/V1_nanoV7_unfolding_allWeight_tightMuonIso_tightJetID_newFillUnfolding_newDphiBBbinning/' 
-outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/' 
-if syst != 'NONE':
-  outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB/'+syst+'/'
+#outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB_postProc/' 
+#if syst != 'NONE':
+outputDir_scratch = '/uscmst1b_scratch/lpc1/lpctrig/duong//Output_ZplusB_pdfScale/'+syst+'/'
 
 
 #Print setting
@@ -121,8 +129,8 @@ print 'Output location scratch:                                    ', outputDir_
 
 #////////////////////////////////////////////////////////////////////
 samples_input = []
-if len(sys.argv) > 1: 
-  samples_input = sys.argv[1].split(',') #all, or DY_2J_amcatnlo_MC_2018
+if len(sys.argv) > 2: 
+  samples_input = sys.argv[2].split(',') #all, or DY_2J_amcatnlo_MC_2018
 
 
 json_file = open(dataSet_list)
@@ -167,7 +175,7 @@ for line in lines:
     nJob = make_input_file_list(nFile, work_dir, file_list_name)
     
     #prepare condor job configuration
-    write_condor_config(work_dir, sample_format, data_name, dir_final_rootFile, nJob, syst, compilewithsyst, debug)
+    write_condor_config(work_dir, sample_format, sample_format_processing,data_name, dir_final_rootFile, nJob, syst, compile_with_pdfscalesyst, debug)
     
     #copy codes, ....
     os.system('cp '+sourceDir+'/Makefile ' + work_dir)
@@ -207,6 +215,7 @@ for line in lines:
       print work_dir
 
     #############hadd output root files###########
+    os.system('mkdir ' + outputDir_scratch)
     os.system('rm ' + outputDir_scratch + '/' + data_name + '.root')
     cmd_hadd = 'hadd -f -k ' + outputDir_scratch + '/' + data_name + '.root @' + nameTmp 
     print cmd_hadd
