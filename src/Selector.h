@@ -29,7 +29,7 @@ class Selector
   virtual void Terminate(TList* mergedList, std::string outFileName) {} ; //outFileName is used to write parameter, like cuts, to output file
   virtual void SetRandom() ;
   virtual void SetDataInfo(bool isData, std::string year) {m_isData = isData ; m_year = year ; } ;
-  
+  virtual void SetCentralGenWeight(double centralGenWeight) {m_centralGenWeight = centralGenWeight;}; //this is the central gen weight used to normalize the gen weight. This is useful when the absolute value of gen weight is not always the same like in sherpa sample.  
   virtual void SetBtagCalib(std::string csvFileName, std::string taggerName, std::string effFileName, std::string btagUncType) ;
   virtual void SetEleEffCorr(std::vector<std::string> fName_trig, std::string fName_recSF, std::string fName_IDSF, std::vector<float> w_trig, std::string eleUncType) ;
   virtual void SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<std::string> fName_ID, std::vector<std::string> fName_iso, std::vector<float> w_trig, std::vector<float> w_ID, std::vector<float> w_iso, std::string muonUncType) ;
@@ -64,6 +64,7 @@ class Selector
     if (pdfScaleSystType == "pdfg2") {m_iPdfStart=70; m_iPdfStop=103;}
   };
 
+  double m_centralGenWeight;
 
   bool m_isData ;
   std::string m_year ;

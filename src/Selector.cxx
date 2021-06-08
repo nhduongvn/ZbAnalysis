@@ -132,6 +132,7 @@ float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string jet_main_bt
     float jetPt = (jetIt->m_lvec).Pt() ;
     int iBin = hEff_b->FindFixBin(jetPt) ; //return overflow bin if jetPt > max pt range
     unsigned flav = jetIt->m_flav ;
+    std::string uncTypeInput = "central";
     float eff = hEff_l->GetBinContent(iBin); //jet with pt > max pt range of efficinecy histogram will get the eff of overflow bins
     if (eff <= 0) std::cout << "\n Warning: Efficiency <=0, " << eff ; //we do not want eff = 0 
     BTagEntry::JetFlavor flavCode(BTagEntry::FLAV_UDSG) ;
@@ -143,9 +144,15 @@ float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string jet_main_bt
       eff = hEff_c->GetBinContent(iBin);
       flavCode = BTagEntry::FLAV_C;
     }
-    
+
+    if (uncType == "up" || uncType == "down") uncTypeInput = uncType; //all bc and light are up together
+    if (uncType == "light_up" && flav != 4 && flav != 5) uncTypeInput = "up";
+    if (uncType == "light_down" && flav != 4 && flav != 5) uncTypeInput = "down";
+    if (uncType == "bc_up" && (flav == 4 || flav == 5)) uncTypeInput = "up";
+    if (uncType == "bc_down" && (flav == 4 || flav == 5)) uncTypeInput = "down";
+
     float sf = m_btagReader.eval_auto_bounds(
-                 uncType, 
+                 uncTypeInput, 
                  flavCode, 
                  fabs((jetIt->m_lvec).Eta()), // absolute value of eta
                  jetPt
@@ -194,16 +201,20 @@ float Selector::CalEleSF(LepObj e1, LepObj e2) {
   std::vector<float> w{1.0};
   float sf = 1;
   float err = 0; //relative error treated as uncorrelated = (dy/y)^2 = sum[(dxi/xi)^2]
+  float errRec = 0.0;
+  float errID = 0.0;
   //reconstruction
   std::vector<TH2F*> h{m_hSF_eleRec};
   //first lepton
   std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w) ;
   sf = sfs[0]; 
   err += sfs[2]*sfs[2]; //2=relative error
+  errRec += sfs[2]*sfs[2]; //2=relative error
   //second lepton
   sfs = GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(),h,w);
   sf *= sfs[0] ;
   err += sfs[2]*sfs[2]; //2=relative error
+  errRec += sfs[2]*sfs[2]; //2=relative error
   
   //ID
   h[0] = m_hSF_eleID;
@@ -211,14 +222,23 @@ float Selector::CalEleSF(LepObj e1, LepObj e2) {
   sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w);
   sf *= sfs[0] ;
   err += sfs[2]*sfs[2];
+  errID += sfs[2]*sfs[2];
   //second lepton
   sfs = GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(),h,w);
   sf *= sfs[0] ; 
   err += sfs[2]*sfs[2];
+  errID += sfs[2]*sfs[2];
 
   err = sqrt(err);
+  errRec = sqrt(errRec);
+  errID = sqrt(errID);
+
   if (m_eleUncType == "up") sf = sf*(1+err);
   if (m_eleUncType == "down") sf = sf*(1-err);
+  if (m_eleUncType == "idup") sf = sf*(1+errID);
+  if (m_eleUncType == "iddown") sf = sf*(1-errID);
+  if (m_eleUncType == "recup") sf = sf*(1+errRec);
+  if (m_eleUncType == "recdown") sf = sf*(1-errRec);
 
   return sf; 
 }
@@ -227,12 +247,15 @@ float Selector::CalSingleEleSF(LepObj e1) {
   std::vector<float> w{1.0};
   float sf = 1;
   float err = 0; //relative error treated as uncorrelated = (dy/y)^2 = sum[(dxi/xi)^2]
+  float errRec = 0.0;
+  float errID = 0.0;
   //reconstruction
   std::vector<TH2F*> h{m_hSF_eleRec};
   //first lepton
   std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w) ;
   sf = sfs[0]; 
   err += sfs[2]*sfs[2]; //2=relative error
+  errRec += sfs[2]*sfs[2]; //2=relative error
   
   //ID
   h[0] = m_hSF_eleID;
@@ -240,10 +263,17 @@ float Selector::CalSingleEleSF(LepObj e1) {
   sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w);
   sf *= sfs[0] ;
   err += sfs[2]*sfs[2];
+  errID += sfs[2]*sfs[2];
 
   err = sqrt(err);
+  errRec = sqrt(errRec);
+  errID = sqrt(errID);
   if (m_eleUncType == "up") sf = sf*(1+err);
   if (m_eleUncType == "down") sf = sf*(1-err);
+  if (m_eleUncType == "recup") sf = sf*(1+errRec);
+  if (m_eleUncType == "recdown") sf = sf*(1-errRec);
+  if (m_eleUncType == "idup") sf = sf*(1+errID);
+  if (m_eleUncType == "iddown") sf = sf*(1-errID);
 
   return sf; 
 }
@@ -251,6 +281,8 @@ float Selector::CalSingleEleSF(LepObj e1) {
 float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
   float sf(1.0);
   float err(0.0);
+  float errID(0.0);
+  float errIso(0.0);
 #ifdef MC_2016
   //////////////
   //ID
@@ -259,10 +291,12 @@ float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
   std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonID, m_muonID_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2]; //relative error
+  errID += sfs[2]*sfs[2]; //relative error
   //second lepton
   sfs = GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(), m_hSF_muonID, m_muonID_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errID += sfs[2]*sfs[2];
   
   /////////////////
   //Iso
@@ -271,10 +305,12 @@ float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
   sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonIso, m_muonIso_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errIso += sfs[2]*sfs[2];
   //second lepton
   sfs = GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(), m_hSF_muonIso, m_muonIso_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errIso += sfs[2]*sfs[2];
 #endif
 #if defined(MC_2017) || defined(MC_2018)
   ///////////
@@ -284,10 +320,12 @@ float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
   std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonID, m_muonID_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errID += sfs[2]*sfs[2];
   //second muon
   sfs = GetSF_2DHist(e2.m_lvec.Pt(),fabs(e2.m_lvec.Eta()), m_hSF_muonID, m_muonID_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errID += sfs[2]*sfs[2];
   
   ///////////
   //Iso
@@ -296,14 +334,22 @@ float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
   sfs = GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errIso += sfs[2]*sfs[2];
   //second muon
   sfs = GetSF_2DHist(e2.m_lvec.Pt(),fabs(e2.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errIso += sfs[2]*sfs[2];
 #endif
   err = sqrt(err);
+  errID = sqrt(errID);
+  errIso = sqrt(errIso);
   if (m_muonUncType == "up") sf = sf*(1+err);
   if (m_muonUncType == "down") sf = sf*(1-err);
+  if (m_muonUncType == "idup") sf = sf*(1+errID);
+  if (m_muonUncType == "iddown") sf = sf*(1-errID);
+  if (m_muonUncType == "isoup") sf = sf*(1+errIso);
+  if (m_muonUncType == "isodown") sf = sf*(1-errIso);
 
   return sf ;
 }
@@ -311,6 +357,8 @@ float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
 float Selector::CalSingleMuonSF_id_iso(LepObj e1) {
   float sf(1.0);
   float err(0.0);
+  float errID(0.0);
+  float errIso(0.0);
 #ifdef MC_2016
   //////////////
   //ID
@@ -319,6 +367,7 @@ float Selector::CalSingleMuonSF_id_iso(LepObj e1) {
   std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonID, m_muonID_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2]; //relative error
+  errID += sfs[2]*sfs[2]; //relative error
   
   /////////////////
   //Iso
@@ -327,6 +376,7 @@ float Selector::CalSingleMuonSF_id_iso(LepObj e1) {
   sfs = GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(), m_hSF_muonIso, m_muonIso_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errIso += sfs[2]*sfs[2];
 #endif
 #if defined(MC_2017) || defined(MC_2018)
   ///////////
@@ -336,6 +386,7 @@ float Selector::CalSingleMuonSF_id_iso(LepObj e1) {
   std::vector<float> sfs = GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonID, m_muonID_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errID += sfs[2]*sfs[2];
   
   ///////////
   //Iso
@@ -344,10 +395,17 @@ float Selector::CalSingleMuonSF_id_iso(LepObj e1) {
   sfs = GetSF_2DHist(e1.m_lvec.Pt(),fabs(e1.m_lvec.Eta()), m_hSF_muonIso, m_muonIso_w);
   sf *= sfs[0];
   err += sfs[2]*sfs[2];
+  errIso += sfs[2]*sfs[2];
 #endif
   err = sqrt(err);
+  errID = sqrt(errID);
+  errIso = sqrt(errIso);
   if (m_muonUncType == "up") sf = sf*(1+err);
   if (m_muonUncType == "down") sf = sf*(1-err);
+  if (m_muonUncType == "idup") sf = sf*(1+errID);
+  if (m_muonUncType == "iddown") sf = sf*(1-errID);
+  if (m_muonUncType == "isoup") sf = sf*(1+errIso);
+  if (m_muonUncType == "isodown") sf = sf*(1-errIso);
 
   return sf ;
 }

@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
   for (int i=0;i<argc;i++) std::cout << argv[i] << " ";
   std::cout << endl;
   std::cout << "======================================================================" << std::endl;
-  arg.keys << "-in" << "-filelist" << "-cfg" << "-out" << "-data" << "-year" << "-syst" 
+  arg.keys << "-in" << "-filelist" << "-cfg" << "-out" << "-data" << "-year" << "-syst" << "-centralGenWeight" 
            << "-firstentry" << "-lastentry" ; 
   arg.Process();
 
@@ -132,9 +132,11 @@ int main(int argc, char *argv[]) {
   long int intlastentry=-1;
   string syst = "NONE";
   string year = "";
+  double centralGenWeight = 0;
 
   if (arg.Key("-data")) intisdata = arg.Get<int>("-data");
   if (arg.Key("-year")) year = arg.Get<string>("-year");
+  if (arg.Key("-centralGenWeight")) centralGenWeight = arg.Get<double>("-centralGenWeight");
   if (arg.Key("-firstentry")) intfirstentry = arg.Get<int>("-firstentry");
   if (arg.Key("-lastentry")) intlastentry = arg.Get<int>("-lastentry");
   if (arg.Key("-syst")) syst = arg.Get<string>("-syst");
@@ -144,6 +146,7 @@ int main(int argc, char *argv[]) {
   std::cout << "\n=================================" << std::endl ;
   std::cout << "\nIs data:              " << isData ;
   std::cout << "\nYear:                 " << year ;
+  std::cout << "\nCentral gen weight    " << centralGenWeight;
   std::cout << "\nFirst and last entry: " << intfirstentry << " " << intlastentry ;
   std::cout << "\nSystematic:           " << syst ;
   
@@ -218,6 +221,10 @@ int main(int argc, char *argv[]) {
   std::string btagUncType = "central";
   if (syst == "BTAGU") btagUncType = "up";
   if (syst == "BTAGD") btagUncType = "down";
+  if (syst == "BTAGLU") btagUncType = "light_up";
+  if (syst == "BTAGLD") btagUncType = "light_down";
+  if (syst == "BTAGBCU") btagUncType = "bc_up";
+  if (syst == "BTAGBCD") btagUncType = "bc_down";
 
   std::string eleUncType = "central";
   std::string muonUncType = "central";
@@ -225,8 +232,16 @@ int main(int argc, char *argv[]) {
   if (syst == "ELED") eleUncType = "down";
   if (syst == "ELETU") eleUncType = "trigup";
   if (syst == "ELETD") eleUncType = "trigdown";
+  if (syst == "ELERECU") eleUncType = "recup";
+  if (syst == "ELERECD") eleUncType = "recdown";
+  if (syst == "ELEIDU") eleUncType = "idup";
+  if (syst == "ELEIDD") eleUncType = "iddown";
   if (syst == "MUONU") muonUncType = "up";
   if (syst == "MUOND") muonUncType = "down";
+  if (syst == "MUONIDU") muonUncType = "idup";
+  if (syst == "MUONIDD") muonUncType = "iddown";
+  if (syst == "MUONISOU") muonUncType = "isoup";
+  if (syst == "MUONISOD") muonUncType = "isodown";
   if (syst == "MUONTU") muonUncType = "trigup";
   if (syst == "MUONTD") muonUncType = "trigdown";
 
@@ -291,6 +306,7 @@ int main(int argc, char *argv[]) {
   if (syst == "PUD") fName_puSF = "CalibData/2018_pileup_ratio_down.root";
 #endif
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
+  sel.SetCentralGenWeight(centralGenWeight);
   sel.SetRandom() ; //used for muon rochestor correction (used when correcting for MC)
   if (CUTS.GetStr("jet_main_btagWP")=="deepCSVT") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effT.root",btagUncType);
   if (CUTS.GetStr("jet_main_btagWP")=="deepJetT") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effT.root",btagUncType);
@@ -316,6 +332,10 @@ int main(int argc, char *argv[]) {
   if (syst == "METJERD") sel.SetJetMetSyst("metjerd");
   if (syst == "METUNCLUSTU") sel.SetJetMetSyst("metunclustu");
   if (syst == "METUNCLUSTD") sel.SetJetMetSyst("metunclustd");
+  if (syst == "JESU_METJESU") sel.SetJetMetSyst("jesu_metjesu");
+  if (syst == "JESD_METJESD") sel.SetJetMetSyst("jesd_metjesd");
+  if (syst == "JERU_METJERU") sel.SetJetMetSyst("jeru_metjeru");
+  if (syst == "JERD_METJERD") sel.SetJetMetSyst("jerd_metjerd");
 
   if (syst == "SCALE") sel.SetPdfScaleSyst("scale");
   //split pdf members to group: 0=0,34; 1=35-69; 2=70-Max; Max = 103

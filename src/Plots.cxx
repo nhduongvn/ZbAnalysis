@@ -14,8 +14,10 @@ const unsigned NBIN_PT_Z = 300;
 const float X_PT_Z[2] = {0,300};
 const unsigned NBIN_DR_2B = 100;
 const float X_DR_2B[2] = {0,10};
-const unsigned NBIN_ETA = 300;
-const float X_ETA[2] = {-3,3};
+const unsigned NBIN_ETA = 480;
+const float X_ETA[2] = {-2.4,2.4};
+const unsigned NBIN_ABSETA = 240;
+const float X_ABSETA[2] = {0,2.4};
 const unsigned NBIN_PHI = 120;
 const float X_PHI[2] = {-TMath::Pi(),TMath::Pi()};
 const unsigned NBIN_DRMIN_Z2B = 100;
@@ -95,11 +97,13 @@ class ZbPlots
       h_pt_jet = new TH1D(name + "_pt_jet","",NBIN_PT_JET,X_PT_JET[0],X_PT_JET[1]) ;
       h_phi_jet = new TH1D(name + "_phi_jet","",NBIN_PHI,X_PHI[0],X_PHI[1]) ;
       h_eta_jet = new TH1D(name + "_eta_jet","",NBIN_ETA,X_ETA[0],X_ETA[1]) ;
+      h_abseta_jet = new TH1D(name + "_abseta_jet","",NBIN_ABSETA,X_ABSETA[0],X_ABSETA[1]) ;
       h_mSV_jet = new TH1D(name + "_mSV_jet","",100,0,10) ;
       h_Njet = new TH1D(name + "_Njet","",15,0,15) ;
       h_pt_jet->Sumw2() ;
       h_phi_jet->Sumw2() ;
       h_eta_jet->Sumw2() ;
+      h_abseta_jet->Sumw2() ;
       h_Njet->Sumw2() ;
       h_mSV_jet->Sumw2();
 
@@ -145,6 +149,7 @@ class ZbPlots
       h_pt_jet->Fill(J.m_lvec.Pt(), w) ;
       h_phi_jet->Fill(J.m_lvec.Phi(), w) ;
       h_eta_jet->Fill(J.m_lvec.Eta(), w) ;
+      h_abseta_jet->Fill(fabs(J.m_lvec.Eta()), w) ;
 
       h_pt_dilepton->Fill((Z.m_lep0.m_lvec + Z.m_lep1.m_lvec).Pt(), w);
       h_phi_dilepton->Fill((Z.m_lep0.m_lvec + Z.m_lep1.m_lvec).Phi(), w);
@@ -189,6 +194,7 @@ class ZbPlots
       histolist.push_back(h_pt_jet) ;
       histolist.push_back(h_phi_jet) ;
       histolist.push_back(h_eta_jet) ;   
+      histolist.push_back(h_abseta_jet) ;   
       histolist.push_back(h_mSV_jet) ;
       histolist.push_back(h_Njet) ;
       histolist.push_back(h_pt_dilepton) ;
@@ -225,6 +231,7 @@ class ZbPlots
     TH1D* h_pt_jet ;
     TH1D* h_phi_jet ;
     TH1D* h_eta_jet ;
+    TH1D* h_abseta_jet ;
     TH1D* h_Njet ;
     TH1D* h_pt_dilepton ;
     TH1D* h_phi_dilepton;
@@ -242,6 +249,7 @@ class Z2bPlots : public ZbPlots{
       h_pt_jet1 = new TH1D(name + "_pt_jet1","",NBIN_PT_JET,X_PT_JET[0],X_PT_JET[1]) ;
       h_phi_jet1 = new TH1D(name + "_phi_jet1","",NBIN_PHI,X_PHI[0],X_PHI[1]) ;
       h_eta_jet1 = new TH1D(name + "_eta_jet1","",NBIN_ETA,X_ETA[0],X_ETA[1]) ;
+      h_abseta_jet1 = new TH1D(name + "_abseta_jet1","",NBIN_ABSETA,X_ABSETA[0],X_ABSETA[1]) ;
       h_mSV_jet1 = new TH1D(name + "_mSV_jet1","",100,0,10) ;
       h_m_2b = new TH1D(name + "_m_2b","",NBIN_M_2B,X_M_2B[0],X_M_2B[1]) ;
       h_m_Z2b = new TH1D(name + "_m_Z2b","",NBIN_M_Z2B,X_M_Z2B[0],X_M_Z2B[1]) ;
@@ -259,6 +267,7 @@ class Z2bPlots : public ZbPlots{
       h_pt_jet1->Sumw2() ;
       h_phi_jet1->Sumw2() ;
       h_eta_jet1->Sumw2() ;
+      h_abseta_jet1->Sumw2() ;
       h_mSV_jet1->Sumw2();
       h_m_2b->Sumw2() ;
       h_m_Z2b->Sumw2() ;
@@ -278,6 +287,7 @@ class Z2bPlots : public ZbPlots{
       ZbPlots::Fill(Z, J, w) ;
       h_pt_jet1->Fill(J1.m_lvec.Pt(), w) ;
       h_eta_jet1->Fill(J1.m_lvec.Eta(), w) ;
+      h_abseta_jet1->Fill(fabs(J1.m_lvec.Eta()), w) ;
       h_phi_jet1->Fill(J1.m_lvec.Phi(), w) ;
       h_mSV_jet1->Fill(J1.m_mSV, w);
       TLorentzVector lv_2b = J.m_lvec + J1.m_lvec ;
@@ -311,6 +321,7 @@ class Z2bPlots : public ZbPlots{
       std::vector<TH1*> histolist = ZbPlots::returnHisto() ;
       histolist.push_back(h_pt_jet1) ;
       histolist.push_back(h_eta_jet1) ;
+      histolist.push_back(h_abseta_jet1) ;
       histolist.push_back(h_phi_jet1) ;
       histolist.push_back(h_mSV_jet1) ;
       histolist.push_back(h_m_2b) ;
@@ -332,6 +343,7 @@ class Z2bPlots : public ZbPlots{
     TH1D* h_pt_jet1 ;
     TH1D* h_phi_jet1 ;
     TH1D* h_eta_jet1 ;
+    TH1D* h_abseta_jet1 ;
     TH1D* h_mSV_jet1 ;
     TH1D* h_m_2b ;
     TH1D* h_m_Z2b ;
@@ -485,6 +497,10 @@ class UnfoldingPlots
      float xBins_pt_Z_gen[nBins_pt_Z_gen] = {0,30,50,70,90,150,200};
      unsigned nBin_pt_b(170);
      float x_pt_b[2]={30,200};
+     unsigned nBin_eta_b(96);
+     float x_eta_b[2]={-2.4,2.4};
+     unsigned nBin_abseta_b(48);
+     float x_abseta_b[2]={0,2.4};
      unsigned nBin_pt_Z(200);
      float x_pt_Z[2]={0,200};
      unsigned nBin_dR_2b(46);
@@ -540,6 +556,14 @@ class UnfoldingPlots
      h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_GenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
      h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_noGenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
      h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_UFOFGenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1])); //rec match with underflow or overflow gen
+     h_eta_b1_rec.push_back(new TH1D("eta_b1_rec_all_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1]));
+     h_eta_b1_rec.push_back(new TH1D("eta_b1_rec_GenMatch_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1]));
+     h_eta_b1_rec.push_back(new TH1D("eta_b1_rec_noGenMatch_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1]));
+     h_eta_b1_rec.push_back(new TH1D("eta_b1_rec_UFOFGenMatch_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1])); //rec match with underflow or overflow gen
+     h_abseta_b1_rec.push_back(new TH1D("abseta_b1_rec_all_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1]));
+     h_abseta_b1_rec.push_back(new TH1D("abseta_b1_rec_GenMatch_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1]));
+     h_abseta_b1_rec.push_back(new TH1D("abseta_b1_rec_noGenMatch_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1]));
+     h_abseta_b1_rec.push_back(new TH1D("abseta_b1_rec_UFOFGenMatch_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1])); //rec match with underflow or overflow gen
      h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_all_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
      h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_GenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
      h_pt_b2_rec.push_back(new TH1D("pt_b2_rec_noGenMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
@@ -577,6 +601,14 @@ class UnfoldingPlots
      h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_RecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
      h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_noRecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
      h_pt_b1_gen.push_back(new TH1D("pt_b1_gen_UFOFRecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1])); //gen match with underflow or overflow gen
+     h_eta_b1_gen.push_back(new TH1D("eta_b1_gen_all_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1]));
+     h_eta_b1_gen.push_back(new TH1D("eta_b1_gen_RecMatch_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1]));
+     h_eta_b1_gen.push_back(new TH1D("eta_b1_gen_noRecMatch_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1]));
+     h_eta_b1_gen.push_back(new TH1D("eta_b1_gen_UFOFRecMatch_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1])); //gen match with underflow or overflow gen
+     h_abseta_b1_gen.push_back(new TH1D("abseta_b1_gen_all_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1]));
+     h_abseta_b1_gen.push_back(new TH1D("abseta_b1_gen_RecMatch_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1]));
+     h_abseta_b1_gen.push_back(new TH1D("abseta_b1_gen_noRecMatch_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1]));
+     h_abseta_b1_gen.push_back(new TH1D("abseta_b1_gen_UFOFRecMatch_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1])); //gen match with underflow or overflow gen
      h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_all_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
      h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_RecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
      h_pt_b2_gen.push_back(new TH1D("pt_b2_gen_noRecMatch_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1]));
@@ -611,6 +643,8 @@ class UnfoldingPlots
      h_m_Z2b_gen.push_back(new TH1D("m_Z2b_gen_UFOFRecMatch_" + name, "", nBin_m_Z2b,x_m_Z2b[0],x_m_Z2b[1]));
 
      h_pt_b1_res = new TH2D("pt_b1_res_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1],nBin_pt_b,x_pt_b[0],x_pt_b[1]);
+     h_eta_b1_res = new TH2D("eta_b1_res_" + name, "", nBin_eta_b,x_eta_b[0],x_eta_b[1],nBin_eta_b,x_eta_b[0],x_eta_b[1]);
+     h_abseta_b1_res = new TH2D("abseta_b1_res_" + name, "", nBin_abseta_b,x_abseta_b[0],x_abseta_b[1],nBin_abseta_b,x_abseta_b[0],x_abseta_b[1]);
      h_pt_b2_res = new TH2D("pt_b2_res_" + name, "", nBin_pt_b,x_pt_b[0],x_pt_b[1],nBin_pt_b,x_pt_b[0],x_pt_b[1]);
      h_pt_Z_res = new TH2D("pt_Z_res_" + name, "", nBin_pt_Z,x_pt_Z[0],x_pt_Z[1], nBin_pt_Z,x_pt_Z[0],x_pt_Z[1]);
      h_dR_2b_res = new TH2D("dR_2b_res_" + name, "", nBin_dR_2b,x_dR_2b[0],x_dR_2b[1], nBin_dR_2b,x_dR_2b[0],x_dR_2b[1]);
@@ -622,6 +656,8 @@ class UnfoldingPlots
 
 
      for(auto h : h_pt_b1_rec) h->Sumw2();
+     for(auto h : h_eta_b1_rec) h->Sumw2();
+     for(auto h : h_abseta_b1_rec) h->Sumw2();
      for(auto h : h_pt_b2_rec) h->Sumw2();
      for(auto h : h_pt_Z_rec) h->Sumw2();
      for(auto h : h_dR_2b_rec) h->Sumw2();
@@ -632,6 +668,8 @@ class UnfoldingPlots
      for(auto h : h_m_Z2b_rec) h->Sumw2();
      
      for(auto h : h_pt_b1_gen) h->Sumw2();
+     for(auto h : h_eta_b1_gen) h->Sumw2();
+     for(auto h : h_abseta_b1_gen) h->Sumw2();
      for(auto h : h_pt_b2_gen) h->Sumw2();
      for(auto h : h_pt_Z_gen) h->Sumw2();
      for(auto h : h_dR_2b_gen) h->Sumw2();
@@ -642,6 +680,8 @@ class UnfoldingPlots
      for(auto h : h_m_Z2b_gen) h->Sumw2();
      
      h_pt_b1_res->Sumw2();
+     h_eta_b1_res->Sumw2();
+     h_abseta_b1_res->Sumw2();
      h_pt_b2_res->Sumw2();
      h_pt_Z_res->Sumw2();
      h_dR_2b_res->Sumw2();
@@ -673,6 +713,8 @@ class UnfoldingPlots
       float mZ2b = (Z+b1+b2).M();
       if (iRec != -1){
         h_pt_b1_rec[iRec]->Fill(b1.Pt(),w);
+        h_eta_b1_rec[iRec]->Fill(b1.Eta(),w);
+        h_abseta_b1_rec[iRec]->Fill(abs(b1.Eta()),w);
         h_pt_b2_rec[iRec]->Fill(b2.Pt(),w);
         h_pt_Z_rec[iRec]->Fill(Z.Pt(),w);
         h_dR_2b_rec[iRec]->Fill(b1.DeltaR(b2),w);
@@ -684,6 +726,8 @@ class UnfoldingPlots
       }
       if (iGen!=-1){
         h_pt_b1_gen[iGen]->Fill(b1.Pt(),w) ;
+        h_eta_b1_gen[iGen]->Fill(b1.Eta(),w) ;
+        h_abseta_b1_gen[iGen]->Fill(abs(b1.Eta()),w) ;
         h_pt_b2_gen[iGen]->Fill(b2.Pt(),w) ;
         h_pt_Z_gen[iGen]->Fill(Z.Pt(),w) ;
         h_dR_2b_gen[iGen]->Fill(b1.DeltaR(b2),w);
@@ -734,6 +778,8 @@ class UnfoldingPlots
       float gen_m_Z2b = (gen_Z+gen_b1+gen_b2).M();
 
       FillUFOF(rec_b1.Pt(),gen_b1.Pt(),h_pt_b1_res,h_pt_b1_rec[3],h_pt_b1_gen[3],w_all,gen_w); 
+      FillUFOF(rec_b1.Eta(),gen_b1.Eta(),h_eta_b1_res,h_eta_b1_rec[3],h_eta_b1_gen[3],w_all,gen_w); 
+      FillUFOF(abs(rec_b1.Eta()),abs(gen_b1.Eta()),h_abseta_b1_res,h_abseta_b1_rec[3],h_abseta_b1_gen[3],w_all,gen_w); 
       FillUFOF(rec_b2.Pt(),gen_b2.Pt(),h_pt_b2_res,h_pt_b2_rec[3],h_pt_b2_gen[3],w_all,gen_w); 
       FillUFOF(rec_Z.Pt(),gen_Z.Pt(),h_pt_Z_res,h_pt_Z_rec[3],h_pt_Z_gen[3],w_all,gen_w); 
       FillUFOF(rec_dR_2b,gen_dR_2b,h_dR_2b_res,h_dR_2b_rec[3],h_dR_2b_gen[3],w_all,gen_w); 
@@ -744,6 +790,8 @@ class UnfoldingPlots
       FillUFOF(rec_m_Z2b,gen_m_Z2b,h_m_Z2b_res,h_m_Z2b_rec[3],h_m_Z2b_gen[3],w_all,gen_w); 
       
       h_pt_b1_res->Fill(gen_b1.Pt(),rec_b1.Pt(),gen_w);
+      h_eta_b1_res->Fill(gen_b1.Eta(),rec_b1.Eta(),gen_w);
+      h_abseta_b1_res->Fill(abs(gen_b1.Eta()),abs(rec_b1.Eta()),gen_w);
       h_pt_b2_res->Fill(gen_b2.Pt(),rec_b2.Pt(),gen_w);
       h_pt_Z_res->Fill(gen_Z.Pt(),rec_Z.Pt(),gen_w);
       h_dR_2b_res->Fill(gen_dR_2b,rec_dR_2b,gen_w);
@@ -757,6 +805,8 @@ class UnfoldingPlots
     std::vector<TH1*> returnHisto() {
       std::vector<TH1*> histolist;
       for (unsigned i = 0 ; i < h_pt_b1_rec.size() ; ++i) histolist.push_back(h_pt_b1_rec[i]);
+      for (unsigned i = 0 ; i < h_eta_b1_rec.size() ; ++i) histolist.push_back(h_eta_b1_rec[i]);
+      for (unsigned i = 0 ; i < h_abseta_b1_rec.size() ; ++i) histolist.push_back(h_abseta_b1_rec[i]);
       for (unsigned i = 0 ; i < h_pt_b2_rec.size() ; ++i) histolist.push_back(h_pt_b2_rec[i]);
       for (unsigned i = 0 ; i < h_pt_Z_rec.size() ; ++i) histolist.push_back(h_pt_Z_rec[i]);
       for (unsigned i = 0 ; i < h_dR_2b_rec.size() ; ++i) histolist.push_back(h_dR_2b_rec[i]);
@@ -767,6 +817,8 @@ class UnfoldingPlots
       for (unsigned i = 0 ; i < h_m_Z2b_rec.size() ; ++i) histolist.push_back(h_m_Z2b_rec[i]);
       
       for (unsigned i = 0 ; i < h_pt_b1_gen.size() ; ++i) histolist.push_back(h_pt_b1_gen[i]);
+      for (unsigned i = 0 ; i < h_eta_b1_gen.size() ; ++i) histolist.push_back(h_eta_b1_gen[i]);
+      for (unsigned i = 0 ; i < h_abseta_b1_gen.size() ; ++i) histolist.push_back(h_abseta_b1_gen[i]);
       for (unsigned i = 0 ; i < h_pt_b2_gen.size() ; ++i) histolist.push_back(h_pt_b2_gen[i]);
       for (unsigned i = 0 ; i < h_pt_Z_gen.size() ; ++i) histolist.push_back(h_pt_Z_gen[i]);
       for (unsigned i = 0 ; i < h_dR_2b_gen.size() ; ++i) histolist.push_back(h_dR_2b_gen[i]);
@@ -777,6 +829,8 @@ class UnfoldingPlots
       for (unsigned i = 0 ; i < h_m_Z2b_gen.size() ; ++i) histolist.push_back(h_m_Z2b_gen[i]);
 
       histolist.push_back(h_pt_b1_res);
+      histolist.push_back(h_eta_b1_res);
+      histolist.push_back(h_abseta_b1_res);
       histolist.push_back(h_pt_b2_res);
       histolist.push_back(h_pt_Z_res);
       histolist.push_back(h_dR_2b_res);
@@ -792,6 +846,8 @@ class UnfoldingPlots
     TString m_name;
     //plots for background (x-axis = rec)
     std::vector<TH1D*> h_pt_b1_rec; //0: all rec, 1: rec not have matched gen
+    std::vector<TH1D*> h_eta_b1_rec; //0: all rec, 1: rec not have matched gen
+    std::vector<TH1D*> h_abseta_b1_rec; //0: all rec, 1: rec not have matched gen
     std::vector<TH1D*> h_pt_b2_rec;
     std::vector<TH1D*> h_pt_Z_rec;
     std::vector<TH1D*> h_dR_2b_rec;
@@ -802,6 +858,8 @@ class UnfoldingPlots
     std::vector<TH1D*> h_m_Z2b_rec;
     //plots for eff (x-axis = gen)
     std::vector<TH1D*> h_pt_b1_gen; //0: all gen, 1: gen not have matched reco
+    std::vector<TH1D*> h_eta_b1_gen; //0: all gen, 1: gen not have matched reco
+    std::vector<TH1D*> h_abseta_b1_gen; //0: all gen, 1: gen not have matched reco
     std::vector<TH1D*> h_pt_b2_gen;
     std::vector<TH1D*> h_pt_Z_gen;
     std::vector<TH1D*> h_dR_2b_gen;
@@ -812,6 +870,8 @@ class UnfoldingPlots
     std::vector<TH1D*> h_m_Z2b_gen;
     //plots for response matrix
     TH2D* h_pt_b1_res;
+    TH2D* h_eta_b1_res;
+    TH2D* h_abseta_b1_res;
     TH2D* h_pt_b2_res;
     TH2D* h_pt_Z_res;
     TH2D* h_dR_2b_res;

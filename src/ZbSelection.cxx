@@ -30,7 +30,7 @@ ZbSelection::~ZbSelection() {
 } 
 
 void ZbSelection::SlaveBegin(Reader* r) {
-  h_evt = new TH1D("Nevt","",3,-1.5,1.5) ;
+  h_evt = new TH1D("Nevt","",4,-1.5,2.5) ; //bin 1: total negative weight events, bin 2: total positive weight events, bin 3: total event weighted by genWeight (= bin2 - bin1, if genWeight are always -1,1
   h_pdfW = new TH2D("iPdf_vs_pdfW","",120,0,120,2000,0,2);
   h_scaleW = new TH2D("iScale_vs_scaleW","",10,0,10,500,0,5);
   h_zee_jet = new ZbPlots("Zee_jet") ;
@@ -321,13 +321,22 @@ void ZbSelection::Process(Reader* r) {
   float l1preW = 1.;
 #if defined(MC_2016) || defined(MC_2017) || defined(MC_2018)
   if (*(r->genWeight) < 0) genWeight = -1. ;
-  if (*(r->genWeight) == 0) h_evt->Fill(0) ; 
+  if (*(r->genWeight) == 0) {
+    genWeight = 0;
+    h_evt->Fill(0) ; 
+  }
   if (*(r->genWeight) < 0) h_evt->Fill(-1) ; 
   if (*(r->genWeight) > 0) h_evt->Fill(1) ;
+  if (m_centralGenWeight != 0)  genWeight = *(r->genWeight)/m_centralGenWeight; //use central gen weight to normalize gen weight
   puSF = PileupSF(*(r->Pileup_nTrueInt));
 #endif
 
+//#if defined(SHERPA)
+//  genWeight = *(r->genWeight)/124598120.;
+//#endif
+//  std::cout << "\n Gen weights: " << " " << m_centralGenWeight << " " << *(r->genWeight) << " " << genWeight;
 
+  h_evt->Fill(2,genWeight);
 
 #if defined(MC_2016) || defined(MC_2017)
   l1preW = *(r->L1PreFiringWeight_Nom);  
@@ -502,20 +511,23 @@ void ZbSelection::Process(Reader* r) {
   float metPt = *(r->MET_pt);
   float metPtSmeared = 0;
 
+//TEMP
 #if defined(POSTPROC)
   metPt = *(r->MET_T1_pt);
 #endif
 
 #if defined(POSTPROC) && (defined(MC_2016) || defined(MC_2017) || defined(MC_2018))
   metPtSmeared = *(r->MET_T1Smear_pt);
-  if (m_jetmetSystType == "metjesu") metPt = *(r->MET_T1_pt_jesTotalUp); 
-  if (m_jetmetSystType == "metjesd") metPt = *(r->MET_T1_pt_jesTotalDown);
-  if (m_jetmetSystType == "metjeru") metPt = *(r->MET_T1_pt_jerUp);
-  if (m_jetmetSystType == "metjerd") metPt = *(r->MET_T1_pt_jerDown);
+  if (m_jetmetSystType == "metjesu" || m_jetmetSystType == "jesu_metjesu") metPt = *(r->MET_T1_pt_jesTotalUp); 
+  if (m_jetmetSystType == "metjesd" || m_jetmetSystType == "jesd_metjesd") metPt = *(r->MET_T1_pt_jesTotalDown);
+  if (m_jetmetSystType == "metjeru" || m_jetmetSystType == "jeru_metjeru") metPt = *(r->MET_T1_pt_jerUp);
+  if (m_jetmetSystType == "metjerd" || m_jetmetSystType == "jerd_metjerd") metPt = *(r->MET_T1_pt_jerDown);
   if (m_jetmetSystType == "metunclustu") metPt = *(r->MET_pt_unclustEnUp);
   if (m_jetmetSystType == "metunclustd") metPt = *(r->MET_pt_unclustEnDown);
 #endif
 
+  //std::cout << "\n MET pt: " << m_jetmetSystType << " " << metPt << " " << *(r->MET_T1_pt);
+  
   for (unsigned int i = 0 ; i < *(r->nJet) ; ++i) {
     
     h_Jet_cutflow->Fill(1) ;
@@ -527,18 +539,19 @@ void ZbSelection::Process(Reader* r) {
     
     float jetPt = (r->Jet_pt)[i];
 
+//TEMP
 #if defined(POSTPROC)
     jetPt = (r->Jet_pt_nom)[i];
 #endif
     
 #if defined(POSTPROC) && (defined(MC_2016) || defined(MC_2017) || defined(MC_2018))
-    if (m_jetmetSystType == "jesu") jetPt = (r->Jet_pt_jesTotalUp)[i];
-    if (m_jetmetSystType == "jesd") jetPt = (r->Jet_pt_jesTotalDown)[i];
-    if (m_jetmetSystType == "jeru") jetPt = (r->Jet_pt_jerUp)[i];
-    if (m_jetmetSystType == "jerd") jetPt = (r->Jet_pt_jerDown)[i];
+    if (m_jetmetSystType == "jesu" || m_jetmetSystType == "jesu_metjesu") jetPt = (r->Jet_pt_jesTotalUp)[i];
+    if (m_jetmetSystType == "jesd" || m_jetmetSystType == "jesd_metjesd") jetPt = (r->Jet_pt_jesTotalDown)[i];
+    if (m_jetmetSystType == "jeru" || m_jetmetSystType == "jeru_metjeru") jetPt = (r->Jet_pt_jerUp)[i];
+    if (m_jetmetSystType == "jerd" || m_jetmetSystType == "jerd_metjerd") jetPt = (r->Jet_pt_jerDown)[i];
 #endif
 
-    //std::cout << "\n Jet pt: " << m_jetmetSystType << " " << jetPt;
+    //std::cout << "\n Jet pt: " << m_jetmetSystType << " " << jetPt << " " << (r->Jet_pt_nom)[i];
 
     JetObj jet(jetPt,(r->Jet_eta)[i],(r->Jet_phi)[i],(r->Jet_mass)[i],jetFlav,(r->Jet_btagDeepB)[i],(r->Jet_btagDeepFlavB)[i]) ;
     jet.SetSV(lvec_SVs);
@@ -1007,26 +1020,34 @@ void ZbSelection::Process(Reader* r) {
       trigSF_mu_tmp=CalTrigSF_singleLepton(13, muons[0], trigObj_muon);
     }
     float zem_noTrig_w = evtW*eleSF_w_tmp*muonSF_w_tmp;
+    //TEMP
+    zem_noTrig_w = evtW;
+    trigSF_ele_tmp = 1.;
+    trigSF_mu_tmp = 1.;
+    
+    //ele trigger
     // make sure the masses meet our cuts
-    if ((eles[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0") && muons[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt1")) ||
-        (eles[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt1") && muons[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0")))
+    if (eleTrig && (eles[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0") && muons[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt1")))
     {
       if (bjets.size() >= 2)
       {
         h_emu_2bjet_eleTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_ele_tmp,metPtSmeared);
-        h_emu_2bjet_muTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
-        if (metPt > 80.0) {
-          if (eleTrig) h_emu_2bjet_eleTrig_met80h->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_ele_tmp,metPtSmeared);
-          if (muonTrig) h_emu_2bjet_muTrig_met80h->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
-        }
-        if (metPt < CUTS.Get<float>("MET")) {
-          if (eleTrig) h_emu_2bjet_eleTrig_metCut->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_ele_tmp,metPtSmeared);
-          if (muonTrig) h_emu_2bjet_muTrig_metCut->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
-        }
-      }
-      
+        if (metPt > 80.0) h_emu_2bjet_eleTrig_met80h->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_ele_tmp,metPtSmeared);
+        if (metPt < CUTS.Get<float>("MET")) h_emu_2bjet_eleTrig_metCut->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_ele_tmp,metPtSmeared);
+      } 
     }//end-pt-cut
 
+    // make sure the masses meet our cuts
+    if (muonTrig && (eles[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt1") && muons[0].m_lvec.Pt() >= CUTS.Get<float>("lep_pt0")))
+    {
+      if (bjets.size() >= 2)
+      {
+        h_emu_2bjet_muTrig->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
+        if (metPt > 80.0) h_emu_2bjet_muTrig_met80h->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
+        if (metPt < CUTS.Get<float>("MET")) h_emu_2bjet_muTrig_metCut->Fill(eles[0],muons[0],bjets[0],bjets[1],metPt,zem_noTrig_w*trigSF_mu_tmp,metPtSmeared);
+      }  
+    }//end-pt-cut
+    
   }//end-size
 
 
